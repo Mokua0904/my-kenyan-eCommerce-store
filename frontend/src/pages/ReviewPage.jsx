@@ -3,12 +3,16 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Star, Check, ArrowLeft } from "lucide-react";
 import { useAppContext } from "../context/AppContext";
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
+// 🛠️ SAFE API URL: Checks Vite env first, then falls back
+const API_BASE_URL = 
+  import.meta.env?.VITE_API_URL || 
+  process.env?.REACT_APP_API_URL || 
+  "http://localhost:8000";
 
 function ReviewPage() {
   const { slug } = useParams();
   const navigate = useNavigate();
-  const { products, user } = useAppContext();
+  const { products = [], user } = useAppContext();
 
   const product = products.find((p) => p.slug === slug);
 
@@ -20,14 +24,15 @@ function ReviewPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
 
+  // --- AUTH GUARD ---
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-gray-500 mb-4">Please log in to leave a review.</p>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#F4EDE4] px-4">
+        <div className="bg-white p-8 rounded-2xl shadow-lg border border-[#DCC7AA] text-center max-w-sm w-full">
+          <p className="text-[#7C6652] mb-6 font-medium">Please log in to leave a review.</p>
           <button
             onClick={() => navigate("/login")}
-            className="text-sm text-blue-600 underline"
+            className="w-full bg-[#A6754D] text-white px-6 py-3 rounded-xl font-bold hover:bg-[#8D5F3B] transition"
           >
             Go to Login
           </button>
@@ -36,18 +41,17 @@ function ReviewPage() {
     );
   }
 
+  // --- 404 GUARD ---
   if (!product) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-gray-500 mb-4">Product not found.</p>
-          <button
-            onClick={() => navigate("/shop")}
-            className="text-sm text-blue-600 underline"
-          >
-            Back to Shop
-          </button>
-        </div>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#F4EDE4] px-4">
+        <p className="text-[#7C6652] mb-4 font-medium">Product not found.</p>
+        <button
+          onClick={() => navigate("/shop")}
+          className="text-[#A6754D] font-semibold underline"
+        >
+          Back to Shop
+        </button>
       </div>
     );
   }
@@ -93,82 +97,86 @@ function ReviewPage() {
 
   const ratingLabels = ["", "Poor", "Fair", "Good", "Very Good", "Excellent"];
 
+  // --- SUCCESS SCREEN ---
   if (success) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="text-center">
-          <div className="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Check size={26} className="text-green-600" />
+      <div className="min-h-screen flex items-center justify-center bg-[#F4EDE4]">
+        <div className="text-center bg-white p-10 rounded-2xl shadow-xl border border-[#DCC7AA] max-w-sm w-full">
+          <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-green-200">
+            <Check size={32} className="text-green-600" />
           </div>
-          <h2 className="text-xl font-bold text-gray-900 mb-2">
-            Review submitted!
-          </h2>
-          <p className="text-sm text-gray-500">
-            It will appear after approval. Redirecting you back…
+          <h2 className="text-2xl font-bold text-[#4E3B2C] mb-2">Asante Sana!</h2>
+          <p className="text-sm text-[#7C6652] leading-relaxed">
+            Your review has been submitted successfully. It will appear after approval. Redirecting you back…
           </p>
         </div>
       </div>
     );
   }
 
+  // --- MAIN REVIEW FORM ---
   return (
-    <div className="min-h-screen bg-white">
-      <div className="max-w-lg mx-auto px-4 py-12">
+    <div className="min-h-screen bg-[#F4EDE4] py-12 px-4 sm:px-6">
+      <div className="max-w-xl mx-auto bg-white rounded-2xl shadow-xl border border-[#DCC7AA] p-6 md:p-10">
 
-        {/* Back */}
+        {/* Back Button */}
         <button
           onClick={() => navigate(`/product/${slug}`)}
-          className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800 transition mb-8"
+          className="flex items-center gap-1.5 text-sm text-[#7C6652] hover:text-[#4E3B2C] transition mb-8 font-medium"
         >
-          <ArrowLeft size={15} />
+          <ArrowLeft size={16} />
           Back to product
         </button>
 
-        {/* Product summary */}
-        <div className="flex items-center gap-4 mb-8 pb-8 border-b border-gray-100">
+        {/* Product Summary */}
+        <div className="flex items-center gap-4 mb-8 pb-8 border-b border-[#DCC7AA]">
           {product.primary_image && (
             <img
               src={product.primary_image}
               alt={product.name}
-              className="w-16 h-16 rounded-xl object-cover bg-gray-100 flex-shrink-0"
+              className="w-20 h-20 rounded-xl object-cover bg-gray-100 flex-shrink-0 border border-[#DCC7AA]"
             />
           )}
           <div>
-            <p className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">
+            <p className="text-xs text-[#A6754D] font-bold uppercase tracking-wider mb-1">
               {product.product_type}
             </p>
-            <h1 className="text-base font-bold text-gray-900">{product.name}</h1>
-            <p className="text-sm text-gray-500">
+            <h1 className="text-lg font-bold text-[#4E3B2C] line-clamp-2">{product.name}</h1>
+            <p className="text-sm font-semibold text-[#7C6652] mt-1">
               KES {parseFloat(product.current_price || product.price).toLocaleString()}
             </p>
           </div>
         </div>
 
-        <h2 className="text-2xl font-bold text-gray-900 mb-1">Leave a Review</h2>
-        <p className="text-sm text-gray-400 mb-8">
-          Share your experience to help other shoppers.
-        </p>
+        {/* Header */}
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold text-[#4E3B2C] mb-1">Leave a Review</h2>
+          <p className="text-sm text-[#7C6652]">
+            Share your experience to help other shoppers in Nairobi.
+          </p>
+        </div>
 
-        {/* Star rating — required, comment optional */}
-        <div className="mb-6">
-          <p className="text-sm font-semibold text-gray-700 mb-3">
+        {/* Star Rating */}
+        <div className="mb-8">
+          <p className="text-sm font-bold text-[#4E3B2C] mb-3">
             Your rating <span className="text-red-500">*</span>
           </p>
-          <div className="flex items-center gap-2">
-            <div className="flex gap-1">
+          <div className="flex items-center gap-3">
+            <div className="flex gap-1.5">
               {[1, 2, 3, 4, 5].map((val) => (
                 <button
                   key={val}
                   onClick={() => setRating(val)}
                   onMouseEnter={() => setHovered(val)}
                   onMouseLeave={() => setHovered(0)}
-                  className="transition-transform hover:scale-110"
+                  className="transition-transform hover:scale-110 focus:outline-none"
+                  aria-label={`Rate ${val} stars`}
                 >
                   <Star
-                    size={36}
+                    size={38}
                     className={
                       val <= (hovered || rating)
-                        ? "text-yellow-400 fill-yellow-400"
+                        ? "text-[#A6754D] fill-[#A6754D]" // Brand color for stars
                         : "text-gray-200 fill-gray-200"
                     }
                   />
@@ -176,62 +184,64 @@ function ReviewPage() {
               ))}
             </div>
             {(hovered || rating) > 0 && (
-              <span className="text-sm font-medium text-gray-600 ml-2">
+              <span className="text-sm font-bold text-[#A6754D] bg-[#FAF6F0] px-3 py-1 rounded-lg">
                 {ratingLabels[hovered || rating]}
               </span>
             )}
           </div>
           {!rating && error && (
-            <p className="text-xs text-red-500 mt-1.5">{error}</p>
+            <p className="text-xs text-red-500 mt-2 font-medium">{error}</p>
           )}
         </div>
 
-        {/* Title — optional */}
-        <div className="mb-4">
-          <label className="text-sm font-semibold text-gray-700 block mb-1.5">
-            Title{" "}
-            <span className="text-gray-400 font-normal">(optional)</span>
+        {/* Title Input */}
+        <div className="mb-5">
+          <label className="text-sm font-bold text-[#4E3B2C] block mb-2">
+            Title <span className="text-[#A6754D] font-normal">(optional)</span>
           </label>
           <input
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Summarise your experience"
-            className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-gray-400 transition"
+            className="w-full border border-[#DCC7AA] rounded-xl px-4 py-3 text-sm text-[#4E3B2C] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#A6754D]/30 focus:border-[#A6754D] transition bg-gray-50"
           />
         </div>
 
-        {/* Comment — optional */}
-        <div className="mb-6">
-          <label className="text-sm font-semibold text-gray-700 block mb-1.5">
-            Comment{" "}
-            <span className="text-gray-400 font-normal">(optional)</span>
+        {/* Comment Input */}
+        <div className="mb-8">
+          <label className="text-sm font-bold text-[#4E3B2C] block mb-2">
+            Comment <span className="text-[#A6754D] font-normal">(optional)</span>
           </label>
           <textarea
             value={comment}
             onChange={(e) => setComment(e.target.value)}
-            rows={5}
+            rows={4}
             placeholder="What did you like or dislike? Would you recommend this?"
-            className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-gray-400 transition resize-none"
+            className="w-full border border-[#DCC7AA] rounded-xl px-4 py-3 text-sm text-[#4E3B2C] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#A6754D]/30 focus:border-[#A6754D] transition bg-gray-50 resize-none"
           />
-          <p className="text-xs text-gray-400 mt-1">
+          <p className="text-xs text-[#7C6652] mt-2">
             A star rating alone is enough — a comment helps even more.
           </p>
         </div>
 
+        {/* Error Message */}
         {error && rating > 0 && (
-          <p className="text-sm text-red-500 mb-4">{error}</p>
+          <div className="bg-red-50 text-red-600 border border-red-200 p-3 rounded-lg text-sm mb-6 font-medium">
+            {error}
+          </div>
         )}
 
+        {/* Submit Button */}
         <button
           onClick={handleSubmit}
           disabled={loading || !rating}
-          className="w-full py-3.5 rounded-xl bg-gray-900 text-white text-sm font-semibold hover:bg-gray-700 transition disabled:opacity-40 disabled:cursor-not-allowed"
+          className="w-full py-4 rounded-xl bg-[#A6754D] text-white text-sm font-bold hover:bg-[#8D5F3B] transition disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
         >
-          {loading ? "Submitting…" : "Submit Review"}
+          {loading ? "Submitting..." : "Submit Review"}
         </button>
 
-        <p className="text-xs text-center text-gray-400 mt-4">
+        <p className="text-xs text-center text-[#7C6652] mt-4 font-medium">
           Reviews are held for moderation before going live.
         </p>
       </div>

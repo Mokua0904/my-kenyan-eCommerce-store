@@ -8,7 +8,8 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   const loadUser = useCallback(async () => {
-    const token = localStorage.getItem('admin_access_token');
+    // 🛠️ FIX: Read from "access_token" to match the rest of the app
+    const token = localStorage.getItem('access_token');
 
     if (!token) {
       setLoading(false);
@@ -24,9 +25,10 @@ export function AuthProvider({ children }) {
       ]);
       setUser(res.data);
     } catch (err) {
-      localStorage.removeItem('admin_access_token');
-      localStorage.removeItem('admin_refresh_token');
-      localStorage.removeItem('admin_user');
+      // Token expired or invalid
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
+      localStorage.removeItem('user_data');
       setUser(null);
     } finally {
       setLoading(false);
@@ -38,20 +40,24 @@ export function AuthProvider({ children }) {
   const login = async (credentials) => {
     const res = await authService.login(credentials);
     const { access, refresh, user: userData } = res.data;
-    localStorage.setItem('admin_access_token', access);
-    localStorage.setItem('admin_refresh_token', refresh);
-    localStorage.setItem('admin_user', JSON.stringify(userData));
+    
+    // 🛠️ FIX: Save using the standardized keys
+    localStorage.setItem('access_token', access);
+    localStorage.setItem('refresh_token', refresh);
+    localStorage.setItem('user_data', JSON.stringify(userData));
+    
     setUser(userData);
     return res.data;
   };
 
   const logout = async () => {
     try {
-      await authService.logout(localStorage.getItem('admin_refresh_token'));
+      await authService.logout(localStorage.getItem('refresh_token'));
     } finally {
-      localStorage.removeItem('admin_access_token');
-      localStorage.removeItem('admin_refresh_token');
-      localStorage.removeItem('admin_user');
+      // 🛠️ FIX: Clear standardized keys
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
+      localStorage.removeItem('user_data');
       setUser(null);
     }
   };
@@ -63,7 +69,7 @@ export function AuthProvider({ children }) {
       login,
       logout,
       setUser,
-      isAuthenticated: !!user,  // ← added
+      isAuthenticated: !!user,
     }}>
       {children}
     </AuthContext.Provider>

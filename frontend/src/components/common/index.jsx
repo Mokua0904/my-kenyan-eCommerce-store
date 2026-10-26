@@ -1,5 +1,6 @@
 import React from "react";
 import { X, AlertTriangle, CheckCircle } from "lucide-react";
+
 const BADGE_STYLES = {
   active: { background: "#27ae60" },
   completed: { background: "#27ae60" },
@@ -41,11 +42,10 @@ export function StatusBadge({ status }) {
     </span>
   );
 }
+
 export function Avatar({ user, size = 32 }) {
-  const initials =
-    (
-      (user?.first_name?.[0] || "") + (user?.last_name?.[0] || "")
-    ).toUpperCase() || "?";
+  const initials = ((user?.first_name?.[0] || "") + (user?.last_name?.[0] || "")).toUpperCase() || "?";
+  
   if (user?.avatar) {
     return (
       <img
@@ -53,103 +53,62 @@ export function Avatar({ user, size = 32 }) {
         alt=""
         className="avatar"
         style={{ width: size, height: size }}
+        onError={(e) => { e.target.style.display = 'none'; }}
       />
     );
   }
+  
   return (
-    <div
-      className="avatar-placeholder"
-      style={{ width: size, height: size, fontSize: size * 0.4 }}
-    >
+    <div className="avatar-placeholder" style={{ width: size, height: size, fontSize: size * 0.4 }}>
       {initials}
     </div>
   );
 }
+
 export function Spinner({ size = 20 }) {
   return <div className="spinner" style={{ width: size, height: size }} />;
 }
+
 export function LoadingState() {
   return (
     <div className="loading-overlay">
       <Spinner size={32} />
-      <span style={{ fontSize: 13, color: "var(--text-muted)" }}>
-        Loading...
-      </span>
+      <span style={{ fontSize: 13, color: "var(--text-muted)" }}>Loading...</span>
     </div>
   );
 }
+
 export function EmptyState({ icon: Icon, title, description, action }) {
   return (
     <div style={{ textAlign: "center", padding: "60px 24px" }}>
       {Icon && (
-        <div
-          style={{
-            width: 64,
-            height: 64,
-            borderRadius: "50%",
-            background: "var(--primary-bg)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            margin: "0 auto 16px",
-            color: "var(--primary)",
-          }}
-        >
+        <div style={{ width: 64, height: 64, borderRadius: "50%", background: "var(--primary-bg)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", color: "var(--primary)" }}>
           <Icon size={28} />
         </div>
       )}
-      <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 6 }}>
-        {title}
-      </div>
-      {description && (
-        <div
-          style={{ color: "var(--text-muted)", fontSize: 13, marginBottom: 20 }}
-        >
-          {description}
-        </div>
-      )}
+      <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 6 }}>{title}</div>
+      {description && <div style={{ color: "var(--text-muted)", fontSize: 13, marginBottom: 20 }}>{description}</div>}
       {action}
     </div>
   );
 }
+
 export function StatCard({ icon: Icon, label, value, badge, badgeColor }) {
   return (
     <div className="stat-card">
-      <div className="stat-icon">
-        <Icon size={22} />
-      </div>
+      <div className="stat-icon"><Icon size={22} /></div>
       <div className="stat-value">{value}</div>
       <div className="stat-label">{label}</div>
-      {badge && (
-        <div
-          style={{
-            marginTop: 6,
-            fontSize: 12,
-            color: badgeColor || "var(--success)",
-            fontWeight: 500,
-          }}
-        >
-          {badge}
-        </div>
-      )}
+      {badge && <div style={{ marginTop: 6, fontSize: 12, color: badgeColor || "var(--success)", fontWeight: 500 }}>{badge}</div>}
     </div>
   );
 }
+
 export function Modal({ open, onClose, title, children, width = 520 }) {
   if (!open) return null;
   return (
     <div
-      style={{
-        position: "fixed",
-        inset: 0,
-        background: "rgba(26,17,8,0.5)",
-        zIndex: 1050,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: 24,
-        animation: "fadeIn 0.15s ease",
-      }}
+      style={{ position: "fixed", inset: 0, background: "rgba(26,17,8,0.5)", zIndex: 1050, display: "flex", alignItems: "center", justifyContent: "center", padding: 16, animation: "fadeIn 0.15s ease" }}
       onClick={onClose}
     >
       <div
@@ -162,51 +121,17 @@ export function Modal({ open, onClose, title, children, width = 520 }) {
           maxHeight: "90vh",
           overflowY: "auto",
           animation: "slideUp 0.2s ease",
+          margin: "0 16px", // Ensures it never touches phone edges
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            padding: "20px 24px 16px",
-            borderBottom: "1px solid var(--border)",
-          }}
-        >
-          <h3
-            style={{
-              fontSize: 16,
-              fontWeight: 700,
-              color: "var(--text-primary)",
-              margin: 0,
-            }}
-          >
-            {title}
-          </h3>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px 24px 16px", borderBottom: "1px solid var(--border)" }}>
+          <h3 style={{ fontSize: 16, fontWeight: 700, color: "var(--text-primary)", margin: 0 }}>{title}</h3>
           <button
             onClick={onClose}
-            style={{
-              width: 32,
-              height: 32,
-              borderRadius: "var(--radius-sm)",
-              border: "1px solid var(--border)",
-              background: "transparent",
-              color: "var(--text-muted)",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              transition: "all 0.15s",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = "var(--danger-bg)";
-              e.currentTarget.style.color = "var(--danger)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = "transparent";
-              e.currentTarget.style.color = "var(--text-muted)";
-            }}
+            style={{ width: 32, height: 32, borderRadius: "var(--radius-sm)", border: "1px solid var(--border)", background: "transparent", color: "var(--text-muted)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.15s" }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = "var(--danger-bg)"; e.currentTarget.style.color = "var(--danger)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--text-muted)"; }}
           >
             <X size={15} />
           </button>
@@ -216,139 +141,61 @@ export function Modal({ open, onClose, title, children, width = 520 }) {
     </div>
   );
 }
-export function ConfirmModal({
-  open,
-  title,
-  message,
-  onConfirm,
-  onCancel,
-  danger = false,
-}) {
+
+export function ConfirmModal({ open, title, message, onConfirm, onCancel, danger = false }) {
   if (!open) return null;
   return (
     <div
-      style={{
-        position: "fixed",
-        inset: 0,
-        background: "rgba(26,17,8,0.5)",
-        zIndex: 1050,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: 24,
-      }}
+      style={{ position: "fixed", inset: 0, background: "rgba(26,17,8,0.5)", zIndex: 1050, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}
       onClick={onCancel}
     >
       <div
-        style={{
-          background: "var(--surface)",
-          borderRadius: "var(--radius-xl)",
-          boxShadow: "var(--shadow-lg)",
-          width: "100%",
-          maxWidth: 400,
-          padding: 24,
-        }}
+        style={{ background: "var(--surface)", borderRadius: "var(--radius-xl)", boxShadow: "var(--shadow-lg)", width: "100%", maxWidth: 400, padding: 24, margin: "0 16px" }}
         onClick={(e) => e.stopPropagation()}
       >
         <div style={{ textAlign: "center", marginBottom: 20 }}>
-          <div
-            style={{
-              width: 56,
-              height: 56,
-              borderRadius: "50%",
-              background: danger ? "var(--danger-bg)" : "var(--primary-bg)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              margin: "0 auto 14px",
-              color: danger ? "var(--danger)" : "var(--primary)",
-            }}
-          >
+          <div style={{ width: 56, height: 56, borderRadius: "50%", background: danger ? "var(--danger-bg)" : "var(--primary-bg)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 14px", color: danger ? "var(--danger)" : "var(--primary)" }}>
             {danger ? <AlertTriangle size={24} /> : <CheckCircle size={24} />}
           </div>
-          <div style={{ fontSize: 17, fontWeight: 700, marginBottom: 8 }}>
-            {title}
-          </div>
-          <div style={{ color: "var(--text-secondary)", fontSize: 13 }}>
-            {message}
-          </div>
+          <div style={{ fontSize: 17, fontWeight: 700, marginBottom: 8 }}>{title}</div>
+          <div style={{ color: "var(--text-secondary)", fontSize: 13 }}>{message}</div>
         </div>
         <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
-          <button className="btn btn-outline" onClick={onCancel}>
-            Cancel
-          </button>
-          <button
-            className={`btn ${danger ? "btn-danger" : "btn-primary"}`}
-            onClick={onConfirm}
-          >
-            Confirm
-          </button>
+          <button className="btn btn-outline" onClick={onCancel}>Cancel</button>
+          <button className={`btn ${danger ? "btn-danger" : "btn-primary"}`} onClick={onConfirm}>Confirm</button>
         </div>
       </div>
     </div>
   );
 }
+
 export function Pagination({ currentPage, totalPages, onPageChange }) {
+  if (!totalPages || totalPages <= 1) return null;
+
   const pages = [];
   const start = Math.max(1, currentPage - 2);
   const end = Math.min(totalPages, currentPage + 2);
   for (let i = start; i <= end; i++) pages.push(i);
-  if (!totalPages || totalPages <= 1) return null;
 
   return (
     <div className="pagination">
-      <button
-        className="pagination-btn"
-        onClick={() => onPageChange(currentPage - 1)}
-        disabled={currentPage === 1}
-      >
-        ‹
-      </button>
-
+      <button className="pagination-btn" onClick={() => onPageChange(currentPage - 1)} disabled={currentPage === 1}>‹</button>
       {start > 1 && (
         <>
-          <button className="pagination-btn" onClick={() => onPageChange(1)}>
-            1
-          </button>
-          {start > 2 && (
-            <span style={{ padding: "0 4px", color: "var(--text-muted)" }}>
-              …
-            </span>
-          )}
+          <button className="pagination-btn" onClick={() => onPageChange(1)}>1</button>
+          {start > 2 && <span style={{ padding: "0 4px", color: "var(--text-muted)" }}>…</span>}
         </>
       )}
-
       {pages.map((p) => (
-        <button
-          key={p}
-          className={`pagination-btn ${p === currentPage ? "active" : ""}`}
-          onClick={() => onPageChange(p)}
-        >
-          {p}
-        </button>
+        <button key={p} className={`pagination-btn ${p === currentPage ? "active" : ""}`} onClick={() => onPageChange(p)}>{p}</button>
       ))}
-
       {end < totalPages && (
         <>
-          <span style={{ padding: "0 4px", color: "var(--text-muted)" }}>
-            …
-          </span>
-          <button
-            className="pagination-btn"
-            onClick={() => onPageChange(totalPages)}
-          >
-            {totalPages}
-          </button>
+          <span style={{ padding: "0 4px", color: "var(--text-muted)" }}>…</span>
+          <button className="pagination-btn" onClick={() => onPageChange(totalPages)}>{totalPages}</button>
         </>
       )}
-
-      <button
-        className="pagination-btn"
-        onClick={() => onPageChange(currentPage + 1)}
-        disabled={currentPage === totalPages}
-      >
-        ›
-      </button>
+      <button className="pagination-btn" onClick={() => onPageChange(currentPage + 1)} disabled={currentPage === totalPages}>›</button>
     </div>
   );
 }

@@ -32,28 +32,29 @@ export default function ForgotPasswordPage() {
     }
   };
 
+  // --- SUCCESS SCREEN ---
   if (submitted) {
     return (
-      <div className="min-h-[80vh] flex items-center justify-center px-4 bg-[#FDFBF9]">
-        <div className="max-w-md w-full bg-white border border-stone-200 rounded-2xl p-10 shadow-xl text-center">
-          <div className="w-20 h-20 bg-orange-50 text-[#8B4513] rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
+      <div className="min-h-screen flex items-center justify-center px-4 bg-[#F4EDE4] py-12">
+        <div className="max-w-md w-full bg-white border border-[#DCC7AA] rounded-2xl p-10 shadow-xl text-center">
+          <div className="w-20 h-20 bg-[#FAF6F0] text-[#A6754D] border border-[#DCC7AA] rounded-full flex items-center justify-center mx-auto mb-6">
             <Mail size={40} />
           </div>
-          <h1 className="text-2xl font-bold mb-3 text-[#5C4033]">Check your email</h1>
-          <p className="text-stone-500 mb-8 leading-relaxed">
+          <h1 className="text-2xl font-bold mb-3 text-[#4E3B2C]">Check your email</h1>
+          <p className="text-[#7C6652] mb-8 leading-relaxed">
             We sent a password reset link to <br />
-            <span className="font-semibold text-[#8B4513]">{email}</span>.
+            <span className="font-semibold text-[#A6754D]">{email}</span>.
           </p>
           <div className="space-y-4">
             <button
               onClick={() => setSubmitted(false)}
-              className="w-full bg-[#8B4513] text-white py-3 rounded-xl font-semibold hover:bg-[#703610] transition-all shadow-md"
+              className="w-full bg-[#A6754D] text-white py-3 rounded-xl font-semibold hover:bg-[#8D5F3B] transition-all shadow-md"
             >
-          Resend the link
+              Resend the link
             </button>
             <button
               onClick={() => navigate("/login")}
-              className="flex items-center justify-center w-full text-stone-500 hover:text-[#5C4033] font-medium transition-colors"
+              className="flex items-center justify-center w-full text-[#7C6652] hover:text-[#4E3B2C] font-medium transition-colors"
             >
               <ArrowLeft size={18} className="mr-2" /> Back to Login
             </button>
@@ -63,19 +64,21 @@ export default function ForgotPasswordPage() {
     );
   }
 
+  // --- FORM SCREEN ---
   return (
-    <div className="min-h-[80vh] flex items-center justify-center px-4 bg-[#FDFBF9]">
-      <div className="max-w-md w-full bg-white border border-stone-100 rounded-2xl p-8 shadow-2xl shadow-stone-200/50">
+    <div className="min-h-screen flex items-center justify-center px-4 bg-[#F4EDE4] py-12">
+      <div className="max-w-md w-full bg-white border border-[#DCC7AA] rounded-2xl p-8 shadow-2xl">
+        
         <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-[#5C4033] mb-2">Forgot Password?</h1>
-          <p className="text-stone-500">
-         Password reset link will be sent to your Email Address if you are already registered.
+          <h1 className="text-3xl font-bold text-[#4E3B2C] mb-3">Forgot Password?</h1>
+          <p className="text-[#7C6652] leading-relaxed">
+            A password reset link will be sent to your email address if you are already registered.
           </p>
         </div>
 
         <form onSubmit={submit} className="space-y-6">
           <div>
-            <label className="block text-sm font-bold text-[#5C4033] mb-2 ml-1 uppercase tracking-wider">
+            <label className="block text-sm font-bold text-[#4E3B2C] mb-2 ml-1 uppercase tracking-wider">
               Email Address
             </label>
             <input
@@ -83,7 +86,7 @@ export default function ForgotPasswordPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#8B4513]/20 focus:border-[#8B4513] transition-all"
+              className="w-full bg-gray-50 border border-[#DCC7AA] rounded-xl px-4 py-3 text-[#4E3B2C] focus:outline-none focus:ring-2 focus:ring-[#A6754D]/30 focus:border-[#A6754D] transition-all"
               placeholder="Enter your registered email"
             />
           </div>
@@ -91,7 +94,7 @@ export default function ForgotPasswordPage() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-[#8B4513] text-white rounded-xl py-4 font-bold hover:bg-[#703610] disabled:opacity-70 transition-all flex items-center justify-center shadow-lg shadow-stone-200"
+            className="w-full bg-[#A6754D] text-white rounded-xl py-4 font-bold hover:bg-[#8D5F3B] disabled:opacity-70 transition-all flex items-center justify-center shadow-lg"
           >
             {isLoading ? (
               <span className="flex items-center">
@@ -105,12 +108,19 @@ export default function ForgotPasswordPage() {
             )}
           </button>
 
+          <div className="relative text-center my-2">
+            <hr className="border-[#DCC7AA]" />
+            <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-3 text-xs text-[#A6754D] font-bold">
+              OR
+            </span>
+          </div>
+
           <button
             type="button"
             onClick={() => navigate("/login")}
-            className="w-full text-center text-stone-500 hover:text-[#8B4513] font-medium transition-colors text-sm"
+            className="w-full text-center text-[#7C6652] hover:text-[#4E3B2C] font-semibold transition-colors text-sm"
           >
-            Sign in
+            Back to Sign In
           </button>
         </form>
       </div>

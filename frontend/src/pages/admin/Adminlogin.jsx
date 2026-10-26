@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/Authcontext';
-import { Store, Eye, EyeOff } from 'lucide-react';
+import { Store, Eye, EyeOff, ShieldCheck } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function AdminLoginPage() {
@@ -17,17 +17,23 @@ export default function AdminLoginPage() {
     try {
       const data = await login(form);
 
+      // 🛠️ SECURITY FIX: Check the role
       if (!['admin', 'editor'].includes(data?.user?.role)) {
-        toast.error('You do not have permission to access the admin panel.');
+        // If they aren't an admin, clear their token immediately so they can't browse the API
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("token");
+        
+        toast.error('Access denied. You do not have admin privileges.');
         return;
       }
 
+      toast.success('Welcome back, Admin');
       navigate('/admin/dashboard');  
     } catch (err) {
       const msg =
         err.response?.data?.non_field_errors?.[0] ||
         err.response?.data?.detail ||
-        'Invalid credentials';
+        'Invalid email or password';
       toast.error(msg);
     } finally {
       setLoading(false);
@@ -35,99 +41,87 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="login-page">
-      <div className="login-card">
-        <div className="login-logo">
-          <div className="logo-icon">
-            <Store size={28} />
+    <div className="min-h-screen bg-[#4E3B2C] flex items-center justify-center p-4 relative overflow-hidden">
+      
+      {/* Background Decorative Circles */}
+      <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-[#A6754D] rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
+      <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-[#8D5F3B] rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
+
+      <div className="bg-white rounded-2xl p-8 sm:p-10 w-full max-w-md shadow-2xl relative z-10 border border-[#DCC7AA]">
+        
+        {/* Logo & Header */}
+        <div className="text-center mb-8">
+          <div className="w-16 h-16 bg-[#FAF6F0] border border-[#DCC7AA] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm">
+            <Store size={32} className="text-[#A6754D]" />
           </div>
-          <h1>E-Commerce</h1>
-          <p>Admin Dashboard</p>
+          <h1 className="text-2xl font-bold text-[#4E3B2C]">Nairobi Fashion</h1>
+          <p className="text-sm text-[#7C6652] mt-1 flex items-center justify-center gap-1">
+            <ShieldCheck size={14} /> Admin Portal
+          </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="login-form">
-          <div className="form-group">
-            <label className="form-label">Email</label>
+        <form onSubmit={handleSubmit} className="space-y-5">
+          
+          {/* Email */}
+          <div>
+            <label className="block text-sm font-bold text-[#4E3B2C] mb-1.5">Email Address</label>
             <input
               type="email"
-              className="form-control"
-              placeholder="admin@example.com"
+              className="w-full bg-gray-50 border border-[#DCC7AA] rounded-lg px-4 py-3 text-[#4E3B2C] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#A6754D]/30 focus:border-[#A6754D] transition"
+              placeholder="admin@nairobiFashion.co.ke"
               value={form.email}
               onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
               required
             />
           </div>
 
-          <div className="form-group">
-            <label className="form-label">Password</label>
-            <div style={{ position: 'relative' }}>
+          {/* Password */}
+          <div>
+            <label className="block text-sm font-bold text-[#4E3B2C] mb-1.5">Password</label>
+            <div className="relative">
               <input
                 type={showPassword ? 'text' : 'password'}
-                className="form-control"
+                className="w-full bg-gray-50 border border-[#DCC7AA] rounded-lg px-4 py-3 pr-12 text-[#4E3B2C] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#A6754D]/30 focus:border-[#A6754D] transition"
                 placeholder="••••••••"
                 value={form.password}
                 onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
                 required
-                style={{ paddingRight: 40 }}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(s => !s)}
-                style={{
-                  position: 'absolute', right: 10, top: '50%',
-                  transform: 'translateY(-50%)',
-                  background: 'none', border: 'none', cursor: 'pointer',
-                  color: 'var(--text-muted)'
-                }}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#A6754D] hover:text-[#4E3B2C] transition"
               >
-                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
           </div>
 
+          {/* Submit Button */}
           <button
             type="submit"
-            className="btn btn-primary"
-            style={{ width: '100%', justifyContent: 'center', marginTop: 8 }}
+            className="w-full bg-[#A6754D] hover:bg-[#8D5F3B] text-white py-3.5 rounded-lg font-bold text-md transition-all shadow-md disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-4"
             disabled={loading}
           >
-            {loading ? 'Signing in...' : 'Sign In'}
+            {loading ? (
+              <>
+                <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24" fill="none">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                </svg>
+                Authenticating...
+              </>
+            ) : (
+              'Sign In to Dashboard'
+            )}
           </button>
         </form>
-      </div>
 
-      <style>{`
-        .login-page {
-          min-height: 100vh;
-          background: linear-gradient(135deg, var(--sidebar-bg) 0%, #2d1a08 100%);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 24px;
-        }
-        .login-card {
-          background: var(--surface);
-          border-radius: var(--radius-xl);
-          padding: 40px;
-          width: 100%;
-          max-width: 400px;
-          box-shadow: var(--shadow-lg);
-        }
-        .login-logo {
-          text-align: center;
-          margin-bottom: 32px;
-        }
-        .login-logo .logo-icon {
-          width: 56px; height: 56px;
-          background: var(--primary);
-          border-radius: 14px;
-          display: flex; align-items: center; justify-content: center;
-          color: white; margin: 0 auto 12px;
-        }
-        .login-logo h1 { font-size: 22px; font-weight: 700; }
-        .login-logo p { color: var(--text-muted); font-size: 13px; margin-top: 2px; }
-        .login-form { display: flex; flex-direction: column; gap: 16px; }
-      `}</style>
+        {/* Footer Note */}
+        <p className="text-center text-xs text-[#7C6652] mt-8">
+          This is a restricted area. Authorized personnel only.
+        </p>
+      </div>
     </div>
   );
 }

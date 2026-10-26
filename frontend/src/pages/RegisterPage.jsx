@@ -6,7 +6,12 @@ import { showError, showSuccess } from "../services/toast";
 import { Eye, EyeOff, ChevronLeft } from "lucide-react";
 import { GoogleOAuthProvider, useGoogleLogin } from "@react-oauth/google";
 
-const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID || "";
+// 🛠️ SAFE CLIENT ID: Checks Vite env first, then CRA env.
+// IMPORTANT: Put your actual Client ID here as a fallback so it NEVER crashes.
+const GOOGLE_CLIENT_ID = 
+  import.meta.env?.VITE_GOOGLE_CLIENT_ID || 
+  process.env?.REACT_APP_GOOGLE_CLIENT_ID || 
+  "YOUR_GOOGLE_CLIENT_ID_HERE.apps.googleusercontent.com";
 
 function Field({ label, required, error, children }) {
   return (
@@ -28,6 +33,7 @@ function RegisterForm() {
     firstName: "",
     lastName: "",
     email: "",
+    phone: "", // Added phone for Nairobi delivery
     password: "",
     password2: "",
   });
@@ -46,6 +52,12 @@ function RegisterForm() {
     if (!formData.firstName.trim()) errs.firstName = "Required";
     if (!formData.lastName.trim()) errs.lastName = "Required";
     if (!formData.email.trim()) errs.email = "Email is required";
+    // Simple Kenyan phone validation (starts with 07, 01, or +254)
+    if (!formData.phone.trim()) {
+      errs.phone = "Phone number is required for delivery.";
+    } else if (!/^(?:\+254|0)[17]\d{8}$/.test(formData.phone.replace(/\s+/g, ''))) {
+      errs.phone = "Please enter a valid Kenyan phone number (e.g., 0712345678).";
+    }
     if (!formData.password) errs.password = "Password is required";
     if (formData.password !== formData.password2)
       errs.password2 = "Passwords do not match";
@@ -65,6 +77,7 @@ function RegisterForm() {
         password2: formData.password2,
         first_name: formData.firstName,
         last_name: formData.lastName,
+        phone: formData.phone, // Send phone to backend
       });
       showSuccess("Account created successfully!");
       navigate("/login");
@@ -137,15 +150,16 @@ function RegisterForm() {
           </Link>
           <div className="max-w-xs">
             <h1 className="text-5xl font-bold mb-6">Get Started</h1>
-            <p className="text-[#F4EDE4]/80 mb-10">Already have an account?</p>
+            <p className="text-[#F4EDE4]/80 mb-10">Join us to shop the best new arrivals and curated thrift (mitumba) in Nairobi.</p>
+            <p className="text-[#F4EDE4]/80 mb-4">Already have an account?</p>
             <Link
-  to="/login"
-  className="inline-block px-12 py-3 border-2 border-white text-white no-underline rounded-full font-bold hover:bg-white hover:text-black transition"
->
-  Log in
+              to="/login"
+              className="inline-block px-12 py-3 border-2 border-white text-white no-underline rounded-full font-bold hover:bg-white hover:text-black transition"
+            >
+              Log in
             </Link>
           </div>
-          <div className="text-xs opacity-60">© 2026 Ecom Inc.</div>
+          <div className="text-xs opacity-60">© {new Date().getFullYear()} Nairobi Fashion</div>
         </div>
 
         {/* Right Form Panel */}
@@ -160,6 +174,12 @@ function RegisterForm() {
                 disabled={loading}
                 className="flex-1 flex items-center justify-center gap-2 py-2.5 border border-[#DCC7AA] rounded-lg bg-white hover:bg-[#F4EDE4] transition text-sm font-medium text-[#4E3B2C]"
               >
+                <svg className="w-4 h-4" viewBox="0 0 18 18">
+                  <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" fill="#4285F4"/>
+                  <path d="M9.003 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.96v2.332C2.44 15.983 5.485 18 9.003 18z" fill="#34A853"/>
+                  <path d="M3.964 10.712c-.18-.54-.282-1.117-.282-1.71 0-.593.102-1.17.282-1.71V4.96H.957C.347 6.175 0 7.55 0 9.002c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
+                  <path d="M9.003 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.464.891 11.426 0 9.003 0 5.485 0 2.44 2.017.96 4.958L3.967 7.29c.708-2.127 2.692-3.71 5.036-3.71z" fill="#EA4335"/>
+                </svg>
                 Google
               </button>
               <button
@@ -168,6 +188,9 @@ function RegisterForm() {
                 disabled={loading}
                 className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-white text-sm font-medium transition hover:opacity-90 bg-[#1877F2]"
               >
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="white">
+                  <path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.236 2.686.236v2.97h-1.513c-1.491 0-1.956.93-1.956 1.886v2.267h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/>
+                </svg>
                 Facebook
               </button>
             </div>
@@ -179,7 +202,7 @@ function RegisterForm() {
               </span>
             </div>
 
-            <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
               <div className="flex gap-4">
                 <Field label="First Name" required error={fieldErrors.first_name || fieldErrors.firstName}>
                   <input type="text" placeholder="First Name" className={inputCls} onChange={handleChange("firstName")} />
@@ -191,6 +214,17 @@ function RegisterForm() {
 
               <Field label="Email" required error={fieldErrors.email}>
                 <input type="email" placeholder="Email Address" className={inputCls} onChange={handleChange("email")} />
+              </Field>
+
+              {/* 🇰🇪 Added Phone Number Field */}
+              <Field label="Phone Number (for delivery)" required error={fieldErrors.phone}>
+                <input 
+                  type="tel" 
+                  placeholder="07XX XXX XXX" 
+                  className={inputCls} 
+                  onChange={handleChange("phone")} 
+                  value={formData.phone}
+                />
               </Field>
 
               <Field label="Password" required error={fieldErrors.password}>

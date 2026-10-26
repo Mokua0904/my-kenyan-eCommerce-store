@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppContext } from "../context/AppContext";
-import { ArrowRight, Truck, Shield, RefreshCw, Star } from "lucide-react";
+import { ArrowRight, Truck, Shield, RefreshCw, Star, MapPin, Phone, Sparkles } from "lucide-react";
 import ProductCard from "../components/ProductCard";
 import Layout from "../components/Layout/Layout";
 import { API_BASE_URL } from "../services/api";
@@ -17,10 +17,14 @@ function HomePage() {
     ? products.filter((p) => p.is_featured).slice(0, 8)
     : [];
 
+  // 📸 IMAGE SPECIFICATION: 
+  // Replace these Unsplash URLs with your client's actual photos. 
+  // Tip: For a New & Thrift shop, have one image showing crisp new clothes, 
+  // and another showing a well-organized thrift section.
   const heroImages = [
-    "https://images.unsplash.com/photo-1503341455253-b2e723bb3dbb?auto=format&fit=crop&w=1200&q=80",
-    "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=1200&q=80",
-    "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1503341455253-b2e723bb3dbb?auto=format&fit=crop&w=1200&q=80", // Replace with: /images/hero-shop-1.jpg
+    "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=1200&q=80", // Replace with: /images/hero-shop-2.jpg
+    "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=1200&q=80", // Replace with: /images/hero-shop-3.jpg
   ];
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -51,8 +55,6 @@ function HomePage() {
         showSuccess(data.message || "Subscribed successfully.");
         setEmail("");
       } else {
-        // Backend returns field errors like { email: ["...msg..."] }
-        // or generic errors like { detail: "..." } or { message: "..." }
         const errorMsg =
           Object.values(data)?.[0]?.[0] ||
           data.detail ||
@@ -68,6 +70,12 @@ function HomePage() {
   return (
     <Layout>
       <div className="min-h-screen bg-[#F4EDE4]">
+        
+        {/* 🇰🇪 Top Announcement Bar */}
+        <div className="bg-[#A6754D] text-[#FAF6F0] text-center py-2 px-4 text-sm font-medium tracking-wide">
+          📍 Visit our physical shop in Nairobi CBD | Free Delivery for orders over KSh 5,000
+        </div>
+
         {/* Hero Section */}
         <section className="relative h-[85vh] w-full overflow-hidden">
           {heroImages.map((img, i) => (
@@ -84,22 +92,26 @@ function HomePage() {
             ></div>
           ))}
 
-          <div className="absolute inset-0 bg-gradient-to-t from-[#4E3B2C]/70 via-[#4E3B2C]/40 to-transparent"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-[#4E3B2C]/80 via-[#4E3B2C]/40 to-transparent"></div>
 
           <div className="relative z-10 flex flex-col justify-center items-start h-full max-w-6xl mx-auto px-6">
+            <span className="text-[#F8EAD8] font-semibold tracking-widest uppercase text-sm mb-4 bg-[#A6754D] px-3 py-1 rounded">
+              Proudly Kenyan
+            </span>
             <h1 className="text-5xl md:text-6xl font-bold text-white leading-tight mb-6 drop-shadow-lg">
               Elevate Your Everyday Style
             </h1>
-            <p className="text-lg md:text-xl text-[#F8EAD8] mb-8 max-w-2xl">
-              Discover timeless pieces crafted with care — where comfort meets
-              modern design.
+            <p className="text-lg md:text-xl text-[#F8EAD8] mb-8 max-w-2xl drop-shadow">
+              Your ultimate destination for brand new styles and premium curated thrift (mitumba). Shop online from anywhere in Kenya, or visit us in the heart of Nairobi CBD.
             </p>
-            <button
-              onClick={() => navigate("/shop")}
-              className="bg-[#A6754D] text-white px-8 py-4 rounded-lg font-semibold hover:bg-[#8D5F3B] transition flex items-center gap-2"
-            >
-              Shop Now <ArrowRight className="h-5 w-5" />
-            </button>
+            <div className="flex flex-wrap gap-4">
+              <button
+                onClick={() => navigate("/shop")}
+                className="bg-[#A6754D] text-white px-8 py-4 rounded-lg font-semibold hover:bg-[#8D5F3B] transition flex items-center gap-2 shadow-lg"
+              >
+                Shop the Collection <ArrowRight className="h-5 w-5" />
+              </button>
+            </div>
           </div>
 
           <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex space-x-2">
@@ -125,18 +137,18 @@ function HomePage() {
               {[
                 {
                   icon: <Truck className="h-10 w-10 text-[#A6754D]" />,
-                  title: "Free Delivery",
-                  desc: "Enjoy free shipping on orders above KES 5,000.",
+                  title: "Fast Nairobi Delivery",
+                  desc: "Free delivery within Nairobi for orders above KSh 5,000. Countrywide shipping available.",
                 },
                 {
                   icon: <Shield className="h-10 w-10 text-[#A6754D]" />,
-                  title: "Secure Payments",
-                  desc: "Shop with confidence through protected checkout.",
+                  title: "Secure M-Pesa Payments",
+                  desc: "Shop with confidence using secure M-Pesa, card, or Cash on Delivery in CBD.",
                 },
                 {
-                  icon: <RefreshCw className="h-10 w-10 text-[#A6754D]" />,
-                  title: "Easy Returns",
-                  desc: "Hassle-free 30-day returns on all purchases.",
+                  icon: <Sparkles className="h-10 w-10 text-[#A6754D]" />,
+                  title: "New & Thrift (Mitumba)",
+                  desc: "Handpicked, high-quality thrift finds alongside fresh, brand new arrivals.",
                 },
               ].map((feature, i) => (
                 <div
@@ -157,9 +169,10 @@ function HomePage() {
         {/* Featured Products */}
         <section className="py-20 bg-[#F4EDE4]">
           <div className="max-w-7xl mx-auto px-6 text-center">
-            <h2 className="text-3xl font-semibold text-[#4E3B2C] mb-12">
-              Featured Products
+            <h2 className="text-3xl font-semibold text-[#4E3B2C] mb-4">
+              Featured Collections
             </h2>
+            <p className="text-[#7C6652] mb-12">Our best sellers, loved by Nairobi.</p>
 
             {featuredProducts.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -171,7 +184,7 @@ function HomePage() {
               <div className="text-center py-12">
                 <Star className="h-16 w-16 text-[#A6754D] mx-auto mb-4" />
                 <p className="text-[#7C6652] text-lg mb-4">
-                  No featured products found.
+                  Our online store is currently updating.
                 </p>
                 <button
                   onClick={() => navigate("/shop")}
@@ -184,8 +197,38 @@ function HomePage() {
           </div>
         </section>
 
+        {/* Visit Us Section - Crucial for CBD Shop */}
+        <section className="py-16 bg-[#E8DCC4]">
+          <div className="max-w-4xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-8">
+            <div>
+              <h2 className="text-3xl font-semibold text-[#4E3B2C] mb-4">
+                Prefer to shop in person?
+              </h2>
+              <p className="text-[#7C6652] mb-4">
+                Come visit our physical store in Nairobi CBD to browse our latest new arrivals and unique thrift finds. Our team is ready to help you find the perfect fit.
+              </p>
+              <div className="flex items-center gap-2 text-[#4E3B2C] font-medium mb-2">
+                <MapPin className="h-5 w-5 text-[#A6754D]" />
+                <span>[Insert Shop Building Name], [Street], Nairobi CBD</span>
+              </div>
+              <div className="flex items-center gap-2 text-[#4E3B2C] font-medium">
+                <Phone className="h-5 w-5 text-[#A6754D]" />
+                <span>+254 7XX XXX XXX</span>
+              </div>
+            </div>
+            <a 
+              href="https://wa.me/2547XXXXXXXX" // Add your client's actual WhatsApp number here
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="bg-[#25D366] text-white px-8 py-4 rounded-lg font-semibold hover:bg-[#1DA851] transition shadow-lg whitespace-nowrap"
+            >
+              Chat on WhatsApp
+            </a>
+          </div>
+        </section>
+
         {/* Newsletter */}
-        <section className="py-20 bg-[#E8DCC4] text-center">
+        <section className="py-20 bg-[#FAF6F0] text-center">
           <div className="max-w-4xl mx-auto px-6">
             <h2 className="text-3xl font-semibold text-[#4E3B2C] mb-4">
               Stay in the Loop

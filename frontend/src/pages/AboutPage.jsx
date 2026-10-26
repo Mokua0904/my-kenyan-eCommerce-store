@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import Layout from "../components/Layout/Layout";
-import { Truck, RefreshCw, Shield, Headphones } from "lucide-react";
+import { Truck, RefreshCw, Shield, Headphones, MapPin, Sparkles } from "lucide-react";
 
 function AboutPage() {
   return (
@@ -9,55 +9,55 @@ function AboutPage() {
       <div className="min-h-screen bg-[#F4EDE4]">
 
         {/* Hero */}
-        <div className="bg-gray-900 text-white py-20 px-6 text-center">
-          <p className="text-[#A6754D] text-sm font-semibold uppercase tracking-widest mb-3">About Ecom</p>
+        <div className="bg-[#4E3B2C] text-white py-20 px-6 text-center">
+          <p className="text-[#E8DCC4] text-sm font-semibold uppercase tracking-widest mb-3">About Us</p>
           <h1 className="text-4xl md:text-5xl font-bold mb-5">
             Dressed for the Life You Live
           </h1>
-          <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+          <p className="text-[#F4EDE4]/80 text-lg max-w-2xl mx-auto">
             We're a Nairobi-based fashion store built for people who value quality, comfort, and style —
-            without the hassle of mall queues or overpriced boutiques.
+            without the hassle of mall queues or overpriced boutiques. We specialize in fresh new arrivals and premium curated thrift.
           </p>
         </div>
 
         {/* Story */}
-        <div className="max-w-4xl mx-auto px-6 py-20">
+        <div className="max-w-5xl mx-auto px-6 py-20">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
             <div>
               <p className="text-[#A6754D] text-sm font-semibold uppercase tracking-widest mb-3">Our Story</p>
-              <h2 className="text-3xl font-bold text-[#4E3B2C] mb-6">Started in Nairobi, 2020</h2>
+              <h2 className="text-3xl font-bold text-[#4E3B2C] mb-6">Started in Nairobi CBD</h2>
               <div className="space-y-4 text-[#7C6652] leading-relaxed">
                 <p>
-                  Ecom started from a straightforward frustration — finding well-made, fairly priced
+                  We started from a straightforward frustration — finding well-made, fairly priced
                   clothing in Kenya was harder than it should be. We set out to fix that.
                 </p>
                 <p>
-                  What began as a small curated catalogue has grown into a full fashion destination
-                  for men, women, shoes, and accessories. Every item we stock is selected with care
-                  — if we wouldn't wear it ourselves, it doesn't make the cut.
+                  What began as a small physical shop in the heart of Nairobi CBD has grown into a full 
+                  fashion destination. We meticulously handpick both brand new items and high-quality 
+                  thrift (mitumba) pieces — if we wouldn't wear it ourselves, it doesn't make the cut.
                 </p>
                 <p>
-                  Today we serve thousands of customers across Kenya, with same-city delivery in
-                  Nairobi and nationwide shipping through trusted courier partners.
+                  Today we serve thousands of customers across Kenya. You can shop online for same-city 
+                  delivery, or visit our physical store to try things on in person.
                 </p>
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <div className="bg-white rounded-2xl p-6 border border-[#DCC7AA] text-center">
+              <div className="bg-white rounded-2xl p-6 border border-[#DCC7AA] text-center shadow-sm">
                 <div className="text-4xl font-bold text-[#A6754D] mb-1">10K+</div>
-                <p className="text-sm text-[#7C6652] font-medium">Customers</p>
+                <p className="text-sm text-[#7C6652] font-medium">Happy Customers</p>
               </div>
-              <div className="bg-white rounded-2xl p-6 border border-[#DCC7AA] text-center">
+              <div className="bg-white rounded-2xl p-6 border border-[#DCC7AA] text-center shadow-sm">
                 <div className="text-4xl font-bold text-[#A6754D] mb-1">5K+</div>
-                <p className="text-sm text-[#7C6652] font-medium">Products</p>
+                <p className="text-sm text-[#7C6652] font-medium">Curated Items</p>
               </div>
-              <div className="bg-white rounded-2xl p-6 border border-[#DCC7AA] text-center">
+              <div className="bg-white rounded-2xl p-6 border border-[#DCC7AA] text-center shadow-sm">
                 <div className="text-4xl font-bold text-[#A6754D] mb-1">98%</div>
                 <p className="text-sm text-[#7C6652] font-medium">Satisfaction</p>
               </div>
-              <div className="bg-white rounded-2xl p-6 border border-[#DCC7AA] text-center">
-                <div className="text-4xl font-bold text-[#A6754D] mb-1">2020</div>
-                <p className="text-sm text-[#7C6652] font-medium">Founded</p>
+              <div className="bg-white rounded-2xl p-6 border border-[#DCC7AA] text-center shadow-sm">
+                <div className="text-4xl font-bold text-[#A6754D] mb-1">100%</div>
+                <p className="text-sm text-[#7C6652] font-medium">Nairobi Owned</p>
               </div>
             </div>
           </div>
@@ -72,15 +72,15 @@ function AboutPage() {
               {[
                 {
                   label: "Mission",
-                  text: "Make quality fashion accessible to every Kenyan — affordable prices, genuine products, fast delivery.",
+                  text: "Make quality fashion accessible to every Kenyan — offering both brand new trends and sustainable thrift options at affordable prices.",
                 },
                 {
                   label: "Vision",
-                  text: "Become East Africa's most trusted fashion e-commerce platform, known for consistency and care.",
+                  text: "Become East Africa's most trusted fashion destination, known for consistency, quality curation, and exceptional customer care.",
                 },
                 {
                   label: "Values",
-                  text: "Quality over quantity. Honesty in every transaction. Sustainability in every decision.",
+                  text: "Quality over quantity. Honesty in every transaction. Sustainability through our thrift collections.",
                 },
               ].map((item) => (
                 <div key={item.label} className="border-t-2 border-[#A6754D] pt-6">
@@ -93,30 +93,30 @@ function AboutPage() {
         </div>
 
         {/* Why Choose Us */}
-        <div className="max-w-5xl mx-auto px-6 py-20">
-          <p className="text-[#A6754D] text-sm font-semibold uppercase tracking-widest mb-3 text-center">Why Ecom</p>
+        <div className="max-w-6xl mx-auto px-6 py-20">
+          <p className="text-[#A6754D] text-sm font-semibold uppercase tracking-widest mb-3 text-center">Why Shop With Us</p>
           <h2 className="text-3xl font-bold text-[#4E3B2C] mb-12 text-center">What You Can Count On</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
               {
                 icon: <Truck className="h-7 w-7 text-[#A6754D]" />,
-                title: "Fast Delivery",
-                desc: "Same-day delivery in Nairobi. Nationwide shipping within 3 business days.",
+                title: "Fast Nairobi Delivery",
+                desc: "Same-day delivery within Nairobi. Countrywide shipping within 2-3 business days.",
               },
               {
-                icon: <RefreshCw className="h-7 w-7 text-[#A6754D]" />,
-                title: "Easy Returns",
-                desc: "Changed your mind? 30-day hassle-free returns on all orders, no questions asked.",
+                icon: <MapPin className="h-7 w-7 text-[#A6754D]" />,
+                title: "CBD Shop Pickup",
+                desc: "Prefer to shop in person? Pick up your online order directly from our Nairobi CBD shop.",
               },
               {
                 icon: <Shield className="h-7 w-7 text-[#A6754D]" />,
-                title: "Secure Payments",
-                desc: "Pay via M-Pesa, card, or bank transfer. Every transaction is encrypted and safe.",
+                title: "Secure M-Pesa Payments",
+                desc: "Pay securely via M-Pesa STK push, debit/credit card, or Cash on Delivery within CBD.",
               },
               {
-                icon: <Headphones className="h-7 w-7 text-[#A6754D]" />,
-                title: "Real Support",
-                desc: "Talk to a real person. Our support team is available 7 days a week via phone and email.",
+                icon: <Sparkles className="h-7 w-7 text-[#A6754D]" />,
+                title: "New & Thrift",
+                desc: "We curate the best of both worlds — fresh, brand new arrivals alongside high-quality mitumba finds.",
               },
             ].map((item) => (
               <div
@@ -132,18 +132,18 @@ function AboutPage() {
         </div>
 
         {/* CTA */}
-        <div className="bg-gray-900 py-20 px-6 text-center">
+        <div className="bg-[#4E3B2C] py-20 px-6 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            See What We've Got
+            Ready to Upgrade Your Wardrobe?
           </h2>
-          <p className="text-gray-400 mb-8 max-w-xl mx-auto">
-            Browse our latest arrivals in men's, women's, shoes, and accessories.
+          <p className="text-[#F4EDE4]/70 mb-8 max-w-xl mx-auto">
+            Browse our latest new arrivals and unique thrift finds.
           </p>
           <Link
             to="/shop"
-            className="inline-block bg-[#A6754D] hover:bg-[#8D5F3B] text-white px-8 py-4 rounded-lg font-semibold transition"
+            className="inline-block bg-[#A6754D] hover:bg-[#8D5F3B] text-white px-8 py-4 rounded-lg font-bold transition shadow-lg"
           >
-            Shop Now
+            Shop the Collection
           </Link>
         </div>
 

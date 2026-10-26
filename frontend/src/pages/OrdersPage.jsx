@@ -12,7 +12,7 @@ const PAGE_SIZE = 5;
 const STATUS_CONFIG = {
   pending:    { label: "Pending",    icon: Clock,       bg: "#f39c12" },
   processing: { label: "Processing", icon: RefreshCw,   bg: "#e67e22" },
-  shipped:    { label: "Shipped",    icon: Truck,       bg: "#2980b9" },
+  shipped:    { label: "Out for Delivery", icon: Truck, bg: "#2980b9" }, // Localized
   delivered:  { label: "Delivered",  icon: CheckCircle, bg: "#27ae60" },
   completed:  { label: "Completed",  icon: CheckCircle, bg: "#27ae60" },
   cancelled:  { label: "Cancelled",  icon: XCircle,     bg: "#e74c3c" },
@@ -22,7 +22,7 @@ const STATUS_CONFIG = {
 const ZONE_TYPE_CONFIG = {
   cbd:       { label: "CBD",        color: "#2980b9", bg: "#eaf4fb" },
   suburb:    { label: "Suburbs",    color: "#27ae60", bg: "#eafaf1" },
-  upcountry: { label: "Upcountry", color: "#8e44ad", bg: "#f5eefb" },
+  upcountry: { label: "Upcountry",  color: "#8e44ad", bg: "#f5eefb" },
 };
 
 const n   = (v) => Number(v) || 0;
@@ -129,7 +129,7 @@ function OrderCard({ order }) {
   const [expanded, setExpanded] = useState(false);
   const items = order.items || [];
   const date = order.created_at
-    ? new Date(order.created_at).toLocaleString("en", {
+    ? new Date(order.created_at).toLocaleString("en-KE", {
         month: "short", day: "numeric", year: "numeric",
         hour: "2-digit", minute: "2-digit",
       })
@@ -402,15 +402,22 @@ function FilterTab({ label, count, active, onClick }) {
 }
 
 export default function OrdersPage() {
-  const { orders, fetchUserOrders } = useAppContext();
+  const { orders = [], fetchUserOrders } = useAppContext();
   const [page, setPage]     = useState(1);
   const [filter, setFilter] = useState("all");
 
-  useEffect(() => { fetchUserOrders(); }, []);
+  useEffect(() => { 
+    // 🛠️ FIX: Empty dependency array prevents infinite loop crashes
+    if (fetchUserOrders) fetchUserOrders(); 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); 
+
   useEffect(() => { setPage(1); }, [filter]);
 
-  const totalSpend   = orders.reduce((sum, o) => sum + n(o.total), 0);
-  const activeOrders = orders.filter(o => ["pending", "processing", "shipped"].includes(o.status?.toLowerCase()));
+  // Safe fallback if orders is not an array
+  const safeOrders = Array.isArray(orders) ? orders : [];
+  const totalSpend   = safeOrders.reduce((sum, o) => sum + n(o.total), 0);
+  const activeOrders = safeOrders.filter(o => ["pending", "processing", "shipped"].includes(o.status?.toLowerCase()));
 
   const FILTERS = [
     { key: "all",       label: "All Orders" },
@@ -420,8 +427,8 @@ export default function OrdersPage() {
   ];
 
   const filtered = filter === "all"
-    ? orders
-    : orders.filter(o => {
+    ? safeOrders
+    : safeOrders.filter(o => {
         const cfg = FILTERS.find(f => f.key === filter);
         return cfg?.statuses?.includes(o.status?.toLowerCase());
       });
@@ -450,18 +457,18 @@ export default function OrdersPage() {
         </p>
       </div>
 
-      {orders.length > 0 && (
+      {safeOrders.length > 0 && (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14, marginBottom: 28 }}>
-          <StatCard icon={ShoppingBag} label="Total Orders" value={orders.length}          accent="#c2621a" />
+          <StatCard icon={ShoppingBag} label="Total Orders" value={safeOrders.length}          accent="#c2621a" />
           <StatCard icon={Truck}       label="Active"       value={activeOrders.length}     accent="#2980b9" />
           <StatCard icon={CheckCircle} label="Total Spend"  value={`KES ${n(totalSpend).toLocaleString()}`} accent="#27ae60" />
         </div>
       )}
 
-      {orders.length > 0 && (
+      {safeOrders.length > 0 && (
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 20 }}>
           {FILTERS.map(f => {
-            const count = f.key === "all" ? orders.length : orders.filter(o => f.statuses?.includes(o.status?.toLowerCase())).length;
+            const count = f.key === "all" ? safeOrders.length : safeOrders.filter(o => f.statuses?.includes(o.status?.toLowerCase())).length;
             return (
               <FilterTab key={f.key} label={f.label} count={f.key === "all" ? 0 : count} active={filter === f.key} onClick={() => setFilter(f.key)} />
             );

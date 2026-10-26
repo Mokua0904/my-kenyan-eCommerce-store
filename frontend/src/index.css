@@ -4,25 +4,25 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ─── CSS Variables (used by legacy admin components still being migrated) ─── */
+/* ─── CSS Variables (Nairobi Theme) ────────────────────────── */
 :root {
-  --primary:           #c2621a;
-  --primary-dark:      #a34f12;
-  --primary-light:     #d97c3a;
-  --primary-bg:        #fdf0e6;
+  --primary:           #A6754D; /* 🛠️ Nairobi Earthy Orange */
+  --primary-dark:      #8D5F3B;
+  --primary-light:     #C99B76;
+  --primary-bg:        #FAF6F0;
   --surface:           #ffffff;
-  --surface-2:         #f9f8f6;
-  --bg:                #f5f4f2;
-  --sidebar-bg:        #1a1108;
-  --sidebar-text:      #e8d9c8;
-  --sidebar-muted:     #8a7060;
+  --surface-2:         #F4EDE4;
+  --bg:                #F4EDE4;
+  --sidebar-bg:        #4E3B2C; /* 🛠️ Nairobi Dark Brown */
+  --sidebar-text:      #F4EDE4;
+  --sidebar-muted:     #DCC7AA;
   --sidebar-hover:     rgba(255, 255, 255, 0.06);
-  --sidebar-active:    rgba(194, 98, 26, 0.18);
-  --text-primary:      #1a1108;
-  --text-secondary:    #4a3f35;
-  --text-muted:        #9a8878;
-  --border:            #e8e2db;
-  --border-light:      #f0ebe4;
+  --sidebar-active:    rgba(166, 117, 77, 0.2);
+  --text-primary:      #4E3B2C;
+  --text-secondary:    #7C6652;
+  --text-muted:        #B5A090;
+  --border:            #DCC7AA;
+  --border-light:      #EDE4D8;
   --success:           #2d7a4a;
   --success-bg:        #eaf5ee;
   --warning:           #b87a10;
@@ -50,8 +50,8 @@ body {
   font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: #f5f4f2;
-  color: #1a1108;
+  background: var(--surface-2);
+  color: var(--text-primary);
 }
 
 code {
@@ -123,7 +123,7 @@ code {
   font-size: 13.5px; font-family: inherit; color: var(--text-primary);
   background: var(--surface); outline: none; transition: border-color 0.2s, box-shadow 0.2s; width: 100%;
 }
-.form-control:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(194,98,26,0.1); }
+.form-control:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(166,117,77,0.15); }
 .form-control::placeholder { color: var(--text-muted); }
 select.form-control { cursor: pointer; }
 textarea.form-control { resize: vertical; min-height: 80px; }
@@ -184,14 +184,6 @@ tbody tr:last-child td { border-bottom: none; }
 
 .loading-overlay { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 20px; gap: 12px; }
 .spinner { border: 3px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.7s linear infinite; }
-
-.flex { display: flex; }
-.items-center { align-items: center; }
-.justify-between { justify-content: space-between; }
-.gap-2 { gap: 8px; }
-.gap-3 { gap: 12px; }
-.mb-4 { margin-bottom: 16px; }
-.mb-6 { margin-bottom: 24px; }
 
 /* ─── Animations ───────────────────────────────────────────── */
 @keyframes spin    { to { transform: rotate(360deg); } }

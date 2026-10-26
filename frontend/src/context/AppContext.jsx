@@ -35,6 +35,7 @@ export const AppProvider = ({ children }) => {
     return response.json();
   };
 
+  // ─── User Data Fetching ──────────────────────────────────────────────────
   const fetchUserAddresses = useCallback(async () => {
     try {
       const token = localStorage.getItem("access_token");
@@ -94,6 +95,7 @@ export const AppProvider = ({ children }) => {
     }
   }, [BASE]);
 
+  // ─── Auth Restoration on Refresh ─────────────────────────────────────────
   useEffect(() => {
     const token = localStorage.getItem("access_token");
     const userData = localStorage.getItem("user_data");
@@ -113,12 +115,26 @@ export const AppProvider = ({ children }) => {
     setIsLoading(false);
   }, [fetchUserOrders, fetchUserAddresses]);
 
+  // ─── Product Fetching ────────────────────────────────────────────────────
+  const fetchAllProducts = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const res = await api.get("/products/");
+      setProducts(res.data.results || res.data || []);
+    } catch (err) {
+      console.error("Failed to fetch products:", err);
+      setProducts([]);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
   const fetchProductsByCategory = async (categorySlug) => {
     try {
       setIsLoading(true);
       setCurrentCategory(categorySlug);
       const res = await api.get("/products/", { params: { category__slug: categorySlug } });
-      setProducts(res.data.results || res.data);
+      setProducts(res.data.results || res.data || []);
     } catch (err) {
       console.error(`Failed to fetch products for category "${categorySlug}":`, err);
       setProducts([]);
@@ -127,7 +143,21 @@ export const AppProvider = ({ children }) => {
     }
   };
 
- useEffect(() => {
+  const fetchProductBySlug = async (slug) => {
+    try {
+      setIsLoading(true);
+      const res = await api.get(`/products/${slug}/`);
+      setSelectedProduct(res.data);
+    } catch (err) {
+      console.error(`Failed to fetch product "${slug}":`, err);
+      setSelectedProduct(null);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // ─── Initial Data Fetch ──────────────────────────────────────────────────
+  useEffect(() => {
     const fetchAll = async () => {
       try {
         setIsLoading(true);
@@ -135,7 +165,7 @@ export const AppProvider = ({ children }) => {
           api.get("/products/"),
           api.get("/products/categories/"),
         ]);
-        setProducts(productsRes.data.results || productsRes.data);
+        setProducts(productsRes.data.results || productsRes.data || []);
         const cats = categoriesRes.data.results || categoriesRes.data || [];
         setCategories(cats.filter((c) => c.is_active));
       } catch (err) {
@@ -148,6 +178,7 @@ export const AppProvider = ({ children }) => {
     fetchAll();
   }, []);
 
+  // ─── Cart ────────────────────────────────────────────────────────────────
   const addToCart = (product, size, quantity = 1) => {
     const existingItemIndex = cart.findIndex(
       (item) => item.id === product.id && item.selectedSize === size
@@ -190,6 +221,7 @@ export const AppProvider = ({ children }) => {
   const getCartItemsCount = () =>
     cart.reduce((count, item) => count + item.quantity, 0);
 
+  // ─── Orders ──────────────────────────────────────────────────────────────
   const placeOrder = async (orderData) => {
     try {
       const token = localStorage.getItem("access_token");
@@ -232,10 +264,12 @@ export const AppProvider = ({ children }) => {
     );
   };
 
+  // ─── Auth ────────────────────────────────────────────────────────────────
   const login = async (email, password) => {
     try {
       setIsLoading(true);
-      const response = await fetch(`${BASE}/auth/token/`, {
+      // 🛠️ FIX: Correct endpoint matching the Ecom backend
+      const response = await fetch(`${BASE}/accounts/auth/login/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -248,7 +282,7 @@ export const AppProvider = ({ children }) => {
 
       let userData = null;
       try {
-        const profileResponse = await fetch(`${BASE}/accounts/profile/`, {  // ← fixed
+        const profileResponse = await fetch(`${BASE}/accounts/profile/`, {
           headers: { Authorization: `Bearer ${data.access}` },
         });
         if (profileResponse.ok) {
@@ -287,7 +321,7 @@ export const AppProvider = ({ children }) => {
       let userData = data.user || null;
       if (!userData) {
         try {
-          const profileResponse = await fetch(`${BASE}/accounts/profile/`, {  // ← fixed
+          const profileResponse = await fetch(`${BASE}/accounts/profile/`, {
             headers: { Authorization: `Bearer ${data.access}` },
           });
           if (profileResponse.ok) {
@@ -353,19 +387,6 @@ export const AppProvider = ({ children }) => {
 
   const isAuthenticated = () => !!user && !!localStorage.getItem("access_token");
 
-  const fetchProductBySlug = async (slug) => {
-    try {
-      setIsLoading(true);
-      const res = await api.get(`/products/${slug}/`);
-      setSelectedProduct(res.data);
-    } catch (err) {
-      console.error(`Failed to fetch product "${slug}":`, err);
-      setSelectedProduct(null);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const contextValue = {
     cart, addToCart, removeFromCart, updateCartItemQuantity, clearCart,
     getCartTotal, getCartItemsCount, orders, placeOrder, getOrderById,
@@ -374,6 +395,7 @@ export const AppProvider = ({ children }) => {
     register, isAuthenticated, products, setProducts, selectedProduct,
     setSelectedProduct, categories, setCategories, isLoading, setIsLoading,
     fetchProductsByCategory, currentCategory, fetchProductBySlug,
+    fetchAllProducts,
   };
 
   return (

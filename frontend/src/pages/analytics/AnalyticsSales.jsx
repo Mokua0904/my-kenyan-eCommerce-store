@@ -21,8 +21,10 @@ export default function AnalyticsSales() {
   const [loading, setLoading]     = useState(true);
 
   useEffect(() => {
+    let isMounted = true;
+
     const load = async () => {
-      setLoading(true);
+      if (isMounted) setLoading(true);
       try {
         const [s, chart, hr, bd] = await Promise.all([
           analyticsService.dashboard({ period }),
@@ -30,20 +32,41 @@ export default function AnalyticsSales() {
           analyticsService.hourlySales(period),
           analyticsService.salesBreakdown(period),
         ]);
-        setStats(s.data);
-        setChartData(chart.data);
-        setHourly(hr.data);
-        setBreakdown(bd.data);
+        
+        if (isMounted) {
+          setStats(s.data || null);
+          setChartData(chart.data || []);
+          setHourly(hr.data || []);
+          setBreakdown(bd.data || []);
+        }
+      } catch (error) {
+        console.error("Failed to load sales analytics:", error);
+        // 🛠️ FIX: Prevent crash on API failure
+        if (isMounted) {
+          setStats(null);
+          setChartData([]);
+          setHourly([]);
+          setBreakdown([]);
+        }
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     };
     load();
+
+    return () => {
+      isMounted = false;
+    };
   }, [period, granularity]);
 
   if (loading) return <LoadingState />;
 
-  const peakHour = hourly.reduce((max, h) => h.revenue > (max?.revenue || 0) ? h : max, null);
+  // 🛠️ Safe fallbacks
+  const safeChartData = Array.isArray(chartData) ? chartData : [];
+  const safeHourly = Array.isArray(hourly) ? hourly : [];
+  const safeBreakdown = Array.isArray(breakdown) ? breakdown : [];
+
+  const peakHour = safeHourly.reduce((max, h) => h.revenue > (max?.revenue || 0) ? h : max, null);
 
   return (
     <div>
@@ -87,9 +110,9 @@ export default function AnalyticsSales() {
             </div>
           }
         >
-          {chartData.length === 0 ? <EmptyChart /> : (
+          {safeChartData.length === 0 ? <EmptyChart /> : (
             <ResponsiveContainer width="100%" height={280}>
-              <AreaChart data={chartData} margin={{ top: 4, right: 10, bottom: 0, left: 0 }}>
+              <AreaChart data={safeChartData} margin={{ top: 4, right: 10, bottom: 0, left: 0 }}>
                 <defs>
                   <linearGradient id="revenueGrad" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#c2621a" stopOpacity={0.25} />
@@ -120,9 +143,9 @@ export default function AnalyticsSales() {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 20 }}>
         {/* Orders Bar Chart */}
         <ChartCard title="Order Volume" subtitle="Number of orders per period">
-          {chartData.length === 0 ? <EmptyChart /> : (
+          {safeChartData.length === 0 ? <EmptyChart /> : (
             <ResponsiveContainer width="100%" height={220}>
-              <BarChart data={chartData} margin={{ top: 4, right: 10 }}>
+              <BarChart data={safeChartData} margin={{ top: 4, right: 10 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke={CHART_COLORS.grid} />
                 <XAxis dataKey="date" tick={{ fontSize: 10 }} tickFormatter={d => d.slice(5)} />
                 <YAxis tick={{ fontSize: 10 }} />
@@ -138,9 +161,9 @@ export default function AnalyticsSales() {
 
         {/* Revenue by Status */}
         <ChartCard title="Revenue by Status" subtitle="Which statuses contribute most">
-          {breakdown.length === 0 ? <EmptyChart /> : (
+          {safeBreakdown.length === 0 ? <EmptyChart /> : (
             <ResponsiveContainer width="100%" height={220}>
-              <BarChart data={breakdown} margin={{ top: 4, right: 10 }}>
+              <BarChart data={safeBreakdown} margin={{ top: 4, right: 10 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke={CHART_COLORS.grid} />
                 <XAxis dataKey="status" tick={{ fontSize: 10 }} tickFormatter={s => s.charAt(0).toUpperCase() + s.slice(1)} />
                 <YAxis tick={{ fontSize: 10 }} tickFormatter={v => fmt.short(v)} />
@@ -149,7 +172,7 @@ export default function AnalyticsSales() {
                   contentStyle={{ background: 'var(--sidebar-bg)', color: 'white', border: 'none', borderRadius: 8, fontSize: 12 }}
                 />
                 <Bar dataKey="revenue" radius={[4, 4, 0, 0]}>
-                  {breakdown.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
+                  {safeBreakdown.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
@@ -162,10 +185,10 @@ export default function AnalyticsSales() {
         title="Sales by Hour of Day"
         subtitle="Identify peak selling hours to plan campaigns and staffing"
       >
-        {hourly.length === 0 ? <EmptyChart /> : (
+        {safeHourly.length === 0 ? <EmptyChart /> : (
           <div>
             <ResponsiveContainer width="100%" height={160}>
-              <BarChart data={hourly} margin={{ top: 4, right: 10 }}>
+              <BarChart data={safeHourly} margin={{ top: 4, right: 10 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke={CHART_COLORS.grid} vertical={false} />
                 <XAxis dataKey="label" tick={{ fontSize: 9 }} interval={1} />
                 <YAxis tick={{ fontSize: 10 }} tickFormatter={v => fmt.short(v)} />
@@ -174,7 +197,7 @@ export default function AnalyticsSales() {
                   contentStyle={{ background: 'var(--sidebar-bg)', color: 'white', border: 'none', borderRadius: 8, fontSize: 12 }}
                 />
                 <Bar dataKey="revenue" name="Revenue" radius={[3, 3, 0, 0]}>
-                  {hourly.map((h, i) => (
+                  {safeHourly.map((h, i) => (
                     <Cell
                       key={i}
                       fill={h.label === peakHour?.label ? '#c2621a' : 'rgba(194,98,26,0.35)'}

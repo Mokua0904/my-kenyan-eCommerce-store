@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { API_BASE_URL } from "../services/api";
-import { CheckCircle, Clock, XCircle, Download, ShoppingBag, Home } from "lucide-react";
+import { CheckCircle, Clock, XCircle, Download, ShoppingBag, Home, PhoneCall } from "lucide-react";
 
 export default function OrderConfirmationPage() {
   const { orderId } = useParams();
@@ -45,18 +45,19 @@ export default function OrderConfirmationPage() {
     };
 
     poll();
-  }, [orderId]);
+  }, [orderId, token, BASE]);
 
   const handleDownloadReceipt = () => {
     window.open(`${BASE}/payments/receipt/${orderId}/`, "_blank");
   };
 
+  // --- LOADING STATE ---
   if (loading) {
     return (
-      <div style={styles.center}>
-        <div style={styles.card}>
-          <div style={styles.spinner} />
-          <p style={{ color: "#6b7280", marginTop: 16 }}>Checking payment status...</p>
+      <div className="min-h-[70vh] flex items-center justify-center bg-[#F4EDE4] p-4">
+        <div className="bg-white rounded-2xl p-10 max-w-md w-full text-center shadow-lg border border-[#DCC7AA]">
+          <div className="w-10 h-10 border-4 border-[#DCC7AA] border-t-[#A6754D] rounded-full animate-spin mx-auto" />
+          <p className="text-[#7C6652] mt-4 font-medium">Checking payment status...</p>
         </div>
       </div>
     );
@@ -67,83 +68,104 @@ export default function OrderConfirmationPage() {
   const isPending = !isCompleted && !isFailed;
 
   return (
-    <div style={styles.center}>
-      <div style={styles.card}>
-
-        {/* Icon */}
-        <div style={styles.iconWrap(isCompleted ? "#dcfce7" : isFailed ? "#fee2e2" : "#fef9c3")}>
-          {isCompleted
-            ? <CheckCircle size={48} color="#16a34a" />
-            : isFailed
-            ? <XCircle size={48} color="#dc2626" />
-            : <Clock size={48} color="#ca8a04" />}
+    <div className="min-h-[80vh] flex items-center justify-center bg-[#F4EDE4] p-4 py-12">
+      <div className="bg-white rounded-2xl p-8 md:p-10 max-w-lg w-full text-center shadow-xl border border-[#DCC7AA]">
+        
+        {/* Dynamic Icon based on status */}
+        <div className={`w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 ${
+          isCompleted ? "bg-green-100" : isFailed ? "bg-red-100" : "bg-yellow-100"
+        }`}>
+          {isCompleted ? (
+            <CheckCircle size={48} className="text-green-600" />
+          ) : isFailed ? (
+            <XCircle size={48} className="text-red-600" />
+          ) : (
+            <Clock size={48} className="text-yellow-600" />
+          )}
         </div>
 
-        {/* Title */}
-        <h1 style={styles.title}>
+        {/* Title & Subtitle */}
+        <h1 className="text-2xl md:text-3xl font-bold text-[#4E3B2C] mb-3">
           {isCompleted ? "Payment Successful!" : isFailed ? "Payment Failed" : "Payment Pending"}
         </h1>
 
-        {/* Subtitle */}
-        <p style={styles.subtitle}>
+        <p className="text-[#7C6652] text-sm md:text-base mb-6 leading-relaxed">
           {isCompleted
-            ? "Your order has been confirmed and is being processed."
+            ? "Asante sana! Your order has been confirmed. A rider will call you shortly to arrange delivery."
             : isFailed
-            ? "Your payment could not be completed. Please try again."
+            ? "Your payment could not be completed. Please try again or choose Cash on Delivery."
             : polling
-            ? "We're waiting for your payment confirmation. This may take a moment..."
-            : "Payment is still being confirmed. Check your orders for the latest status."}
+            ? "We are waiting for your M-Pesa confirmation. Please enter your PIN on your phone."
+            : "Payment is still being confirmed. Check your orders page for the latest status."}
         </p>
 
-        {/* Polling indicator */}
+        {/* Polling Indicator (Only shows when pending) */}
         {isPending && polling && (
-          <div style={styles.pendingBar}>
-            <div style={styles.dot} />
-            <span style={{ fontSize: 13, color: "#92400e" }}>Waiting for M-PESA confirmation...</span>
+          <div className="flex items-center justify-center gap-2 bg-yellow-50 text-yellow-700 rounded-lg py-3 px-4 mb-6 border border-yellow-200">
+            <span className="w-2.5 h-2.5 rounded-full bg-yellow-500 animate-pulse" />
+            <span className="text-sm font-medium">Waiting for M-PESA confirmation...</span>
           </div>
         )}
 
-        {/* Order details */}
-        <div style={styles.detailsBox}>
-          <div style={styles.detailRow}>
-            <span style={styles.detailLabel}>Order ID</span>
-            <span style={styles.detailValue}>#{orderId}</span>
+        {/* Nairobi Delivery Note */}
+        {isCompleted && (
+          <div className="flex items-start gap-3 bg-[#FAF6F0] border border-[#DCC7AA] rounded-lg p-4 mb-6 text-left">
+            <PhoneCall className="text-[#A6754D] shrink-0 mt-0.5" size={20} />
+            <p className="text-sm text-[#4E3B2C]">
+              <strong>Delivery Info:</strong> If you are in Nairobi CBD, our rider will call you before arriving. You can also pick up your order at our shop.
+            </p>
           </div>
-          <div style={styles.detailRow}>
-            <span style={styles.detailLabel}>Payment Method</span>
-            <span style={styles.detailValue}>{data?.provider?.toUpperCase() ?? "—"}</span>
+        )}
+
+        {/* Order Details Box */}
+        <div className="bg-gray-50 rounded-xl p-5 mb-8 text-left border border-gray-100">
+          <div className="flex justify-between items-center py-2 border-b border-gray-200">
+            <span className="text-sm text-gray-500">Order ID</span>
+            <span className="text-sm font-semibold text-[#4E3B2C]">#{orderId}</span>
           </div>
-          <div style={styles.detailRow}>
-            <span style={styles.detailLabel}>Status</span>
-            <span style={{
-              ...styles.detailValue,
-              color: isCompleted ? "#16a34a" : isFailed ? "#dc2626" : "#ca8a04",
-              fontWeight: 700,
-              textTransform: "capitalize",
-            }}>
+          <div className="flex justify-between items-center py-2 border-b border-gray-200">
+            <span className="text-sm text-gray-500">Payment Method</span>
+            <span className="text-sm font-semibold text-[#4E3B2C] uppercase">{data?.provider ?? "M-PESA"}</span>
+          </div>
+          <div className="flex justify-between items-center py-2">
+            <span className="text-sm text-gray-500">Status</span>
+            <span className={`text-sm font-bold capitalize ${
+              isCompleted ? "text-green-600" : isFailed ? "text-red-600" : "text-yellow-600"
+            }`}>
               {data?.status ?? "pending"}
             </span>
           </div>
           {data?.result_desc && (
-            <div style={styles.detailRow}>
-              <span style={styles.detailLabel}>Note</span>
-              <span style={styles.detailValue}>{data.result_desc}</span>
+            <div className="flex justify-between items-start py-2 border-t border-gray-200 mt-2">
+              <span className="text-sm text-gray-500 shrink-0 mr-4">Note</span>
+              <span className="text-sm text-gray-700 text-right">{data.result_desc}</span>
             </div>
           )}
         </div>
 
-        {/* Actions */}
-        <div style={styles.actions}>
+        {/* Action Buttons */}
+        <div className="flex flex-col gap-3">
           {isCompleted && data?.has_receipt && (
-            <button style={styles.btnPrimary} onClick={handleDownloadReceipt}>
-              <Download size={16} /> Download Receipt
+            <button 
+              onClick={handleDownloadReceipt}
+              className="w-full flex items-center justify-center gap-2 bg-[#A6754D] text-white py-3 rounded-lg font-semibold hover:bg-[#8D5F3B] transition shadow-md"
+            >
+              <Download size={18} /> Download Receipt
             </button>
           )}
-          <Link to="/orders" style={styles.btnOutline}>
-            <ShoppingBag size={16} /> My Orders
+          
+          <Link 
+            to="/orders" 
+            className="w-full flex items-center justify-center gap-2 bg-white text-[#4E3B2C] border border-[#DCC7AA] py-3 rounded-lg font-semibold hover:bg-[#F4EDE4] transition"
+          >
+            <ShoppingBag size={18} /> View My Orders
           </Link>
-          <Link to="/" style={styles.btnGhost}>
-            <Home size={16} /> Back to Home
+          
+          <Link 
+            to="/" 
+            className="w-full flex items-center justify-center gap-2 text-[#7C6652] py-3 rounded-lg font-medium hover:text-[#4E3B2C] transition"
+          >
+            <Home size={18} /> Back to Home
           </Link>
         </div>
 
@@ -151,138 +173,3 @@ export default function OrderConfirmationPage() {
     </div>
   );
 }
-
-const styles = {
-  center: {
-    minHeight: "70vh",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: "32px 16px",
-    background: "#f9fafb",
-  },
-  card: {
-    background: "#fff",
-    borderRadius: 16,
-    padding: "48px 40px",
-    maxWidth: 480,
-    width: "100%",
-    textAlign: "center",
-    boxShadow: "0 4px 24px rgba(0,0,0,0.08)",
-  },
-  iconWrap: (bg) => ({
-    width: 88,
-    height: 88,
-    borderRadius: "50%",
-    background: bg,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    margin: "0 auto 24px",
-  }),
-  title: {
-    fontSize: 24,
-    fontWeight: 700,
-    marginBottom: 10,
-    color: "#111827",
-  },
-  subtitle: {
-    fontSize: 14,
-    color: "#6b7280",
-    marginBottom: 24,
-    lineHeight: 1.6,
-  },
-  pendingBar: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-    background: "#fef3c7",
-    borderRadius: 8,
-    padding: "10px 16px",
-    marginBottom: 24,
-  },
-  dot: {
-    width: 8,
-    height: 8,
-    borderRadius: "50%",
-    background: "#f59e0b",
-    animation: "pulse 1.5s infinite",
-  },
-  detailsBox: {
-    background: "#f9fafb",
-    borderRadius: 10,
-    padding: "16px 20px",
-    marginBottom: 28,
-    textAlign: "left",
-  },
-  detailRow: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: "8px 0",
-    borderBottom: "1px solid #f3f4f6",
-  },
-  detailLabel: {
-    fontSize: 13,
-    color: "#6b7280",
-  },
-  detailValue: {
-    fontSize: 13,
-    fontWeight: 600,
-    color: "#111827",
-  },
-  actions: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 10,
-  },
-  btnPrimary: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-    background: "#2563eb",
-    color: "#fff",
-    border: "none",
-    borderRadius: 8,
-    padding: "12px 20px",
-    fontWeight: 600,
-    fontSize: 14,
-    cursor: "pointer",
-  },
-  btnOutline: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-    border: "1px solid #d1d5db",
-    borderRadius: 8,
-    padding: "12px 20px",
-    fontWeight: 600,
-    fontSize: 14,
-    color: "#374151",
-    textDecoration: "none",
-  },
-  btnGhost: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-    borderRadius: 8,
-    padding: "12px 20px",
-    fontWeight: 600,
-    fontSize: 14,
-    color: "#6b7280",
-    textDecoration: "none",
-  },
-  spinner: {
-    width: 40,
-    height: 40,
-    border: "4px solid #e5e7eb",
-    borderTop: "4px solid #2563eb",
-    borderRadius: "50%",
-    animation: "spin 1s linear infinite",
-    margin: "0 auto",
-  },
-};

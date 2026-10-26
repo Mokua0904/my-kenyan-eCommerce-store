@@ -1,15 +1,14 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { notificationService } from '../services';
-import { useAuth } from './Authcontext';
+import { useAuth } from './Authcontext'; 
 
 const NotificationContext = createContext();
 
 export function NotificationProvider({ children }) {
-  const { isAuthenticated } = useAuth();           // ← consume auth state
+  const { isAuthenticated } = useAuth();
   const [unreadCount, setUnreadCount] = useState(0);
 
   const fetchUnreadCount = useCallback(async () => {
-    // ← never fire if not logged in
     if (!isAuthenticated) return;
 
     try {
@@ -21,15 +20,13 @@ export function NotificationProvider({ children }) {
           : 0
       );
     } catch (e) {
-      // Interceptor handles 401 redirect — nothing to do here
       console.error('Failed to fetch notifications:', e);
     }
-  }, [isAuthenticated]);                           // ← re-runs when auth changes
+  }, [isAuthenticated]);
 
   useEffect(() => {
-    // ← don't even start the interval until authenticated
     if (!isAuthenticated) {
-      setUnreadCount(0);                           // ← reset on logout
+      setUnreadCount(0);
       return;
     }
 

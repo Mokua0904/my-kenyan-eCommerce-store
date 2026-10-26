@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { ChevronDown, Search } from "lucide-react";
+import { ChevronDown, Search, HelpCircle } from "lucide-react";
 
 function FAQsPage() {
-  const [openIndex, setOpenIndex] = useState(0);
+  const [openIndex, setOpenIndex] = useState("0-0"); // Open first FAQ by default
   const [searchTerm, setSearchTerm] = useState("");
 
   const faqCategories = [
@@ -15,7 +15,7 @@ function FAQsPage() {
         },
         {
           question: "What payment methods do you accept?",
-          answer: "We accept M-PESA, credit/debit cards, and bank transfers. All transactions are secure and encrypted."
+          answer: "We primarily accept M-PESA (via STK Push), as well as credit/debit cards and PayPal. All transactions are secure and encrypted."
         },
         {
           question: "Do you offer international shipping?",
@@ -27,7 +27,7 @@ function FAQsPage() {
         },
         {
           question: "How long does delivery take?",
-          answer: "Standard delivery takes 2-3 business days in Nairobi and 4-5 business days for other areas. Express delivery is available for urgent orders."
+          answer: "Standard delivery takes 1-2 business days within Nairobi CBD and 3-5 business days for other areas. Express delivery is available for urgent orders."
         }
       ]
     },
@@ -40,15 +40,15 @@ function FAQsPage() {
         },
         {
           question: "Are all products original?",
-          answer: "Yes! All our products are 100% authentic and sourced from authorized distributors. We guarantee quality on every item."
+          answer: "Yes! We sell a mix of brand new items and premium curated thrift (mitumba). Every item is inspected for quality before it goes online."
         },
         {
           question: "Do you restock sold-out items?",
-          answer: "Most items are restocked regularly. You can sign up for restock notifications on product pages to be alerted when items are available again."
+          answer: "Most new items are restocked regularly, but thrift items are often one-of-a-kind. Sign up for our newsletter to be alerted when new stock arrives."
         },
         {
           question: "What is your sizing policy?",
-          answer: "We follow international sizing standards. Our size guides are detailed and accurate. If you're between sizes, we recommend sizing up for comfort."
+          answer: "We follow standard Kenyan and international sizing. Our size guides are detailed and accurate. If you're between sizes, we recommend sizing up for comfort."
         },
         {
           question: "Can I see product reviews before buying?",
@@ -61,19 +61,19 @@ function FAQsPage() {
       faqs: [
         {
           question: "What is your return policy?",
-          answer: "We offer a 30-day return policy on all items in original condition with tags attached. Refunds are processed within 5-7 business days."
+          answer: "We offer a 7-day return policy on all items in original condition. Refunds are processed within 3-5 business days."
         },
         {
           question: "How do I initiate a return?",
-          answer: "Go to your Orders page, select the item you want to return, and follow the return process. We'll provide a prepaid return label."
+          answer: "Bring the item to our Nairobi CBD shop or contact our support team to arrange a pickup. We'll guide you through the process."
         },
         {
           question: "Are there any non-returnable items?",
-          answer: "Intimate items, swimwear, and items without tags cannot be returned for hygiene reasons. All other items are returnable within 30 days."
+          answer: "For hygiene reasons, intimate items and swimwear cannot be returned. Thrift items can be returned if the tags are still attached."
         },
         {
           question: "How long does a refund take?",
-          answer: "Once we receive and inspect your return, refunds are processed within 5-7 business days. You'll receive a notification once it's complete."
+          answer: "Once we receive and inspect your return, refunds are processed within 3-5 business days to your original payment method (M-PESA or Card)."
         },
         {
           question: "What if the item is defective?",
@@ -86,19 +86,19 @@ function FAQsPage() {
       faqs: [
         {
           question: "How do I create an account?",
-          answer: "Click 'Sign Up' in the top right corner, enter your email and password, and you're ready to go. You can also sign in with social media."
+          answer: "Click 'Sign Up' in the top right corner, enter your details, and you're ready to go. You can also sign in using Google or Facebook."
         },
         {
           question: "Is my personal information secure?",
-          answer: "Yes! We use industry-standard SSL encryption and comply with data protection regulations. Your privacy is our priority."
+          answer: "Yes! We use industry-standard SSL encryption and comply with Kenyan data protection regulations. Your privacy is our priority."
         },
         {
           question: "Can I change my password?",
-          answer: "Yes, go to Account Settings and click 'Change Password'. You'll need to verify your email before confirming the change."
+          answer: "Yes, go to Account Settings and click 'Change Password'. You'll need to verify your old password before confirming the change."
         },
         {
           question: "How do I track my order?",
-          answer: "Once your order is shipped, you'll receive a tracking link via email. You can also track it from your Orders page in your account."
+          answer: "Once your order is shipped, you'll receive a tracking link via SMS or email. You can also track it from the 'My Orders' page in your account."
         },
         {
           question: "What if I forget my password?",
@@ -111,7 +111,7 @@ function FAQsPage() {
       faqs: [
         {
           question: "How can I contact customer support?",
-          answer: "You can reach us via email at support@ecom.com, call +254 700 000 000, or use our live chat (9 AM - 6 PM EAT)."
+          answer: "You can reach us via email at support@nairobifashion.co.ke, call/WhatsApp +254 700 000 000, or visit our shop in Nairobi CBD (Mon-Sat, 8 AM - 6 PM)."
         },
         {
           question: "Do you have a loyalty program?",
@@ -123,11 +123,11 @@ function FAQsPage() {
         },
         {
           question: "How often do you have sales?",
-          answer: "We run seasonal sales and flash deals regularly. Subscribe to our newsletter to stay updated on upcoming promotions."
+          answer: "We run seasonal sales and flash deals regularly. Subscribe to our newsletter or follow us on social media to stay updated."
         },
         {
           question: "Do you offer bulk/wholesale orders?",
-          answer: "Yes! For corporate orders and bulk purchases, email us at wholesale@ecom.com and we'll provide special pricing."
+          answer: "Yes! For corporate orders and bulk purchases, email us at wholesale@nairobifashion.co.ke and we'll provide special pricing."
         }
       ]
     }
@@ -147,23 +147,21 @@ function FAQsPage() {
     const isOpen = openIndex === uniqueIndex;
 
     return (
-      <div className="border border-gray-200 rounded-lg overflow-hidden hover:border-blue-300 transition">
+      <div className={`border rounded-xl overflow-hidden transition-all duration-200 ${isOpen ? 'border-[#A6754D] shadow-md' : 'border-[#DCC7AA] hover:border-[#A6754D]'}`}>
         <button
           onClick={() => setOpenIndex(isOpen ? null : uniqueIndex)}
-          className="w-full px-6 py-4 flex items-center justify-between bg-gray-50 hover:bg-gray-100 transition"
+          className={`w-full px-6 py-4 flex items-center justify-between transition ${isOpen ? 'bg-[#FAF6F0]' : 'bg-white hover:bg-gray-50'}`}
         >
-          <h4 className="font-semibold text-gray-900 text-left">{question}</h4>
+          <h4 className={`font-bold text-left ${isOpen ? 'text-[#A6754D]' : 'text-[#4E3B2C]'}`}>{question}</h4>
           <ChevronDown
             size={20}
-            className={`text-gray-600 flex-shrink-0 transition transform ${
-              isOpen ? "rotate-180" : ""
-            }`}
+            className={`flex-shrink-0 transition-transform duration-200 ${isOpen ? "rotate-180 text-[#A6754D]" : "text-[#7C6652]"}`}
           />
         </button>
 
         {isOpen && (
-          <div className="px-6 py-4 bg-white border-t border-gray-200">
-            <p className="text-gray-700 leading-relaxed">{answer}</p>
+          <div className="px-6 py-4 bg-white border-t border-[#DCC7AA]">
+            <p className="text-[#7C6652] leading-relaxed">{answer}</p>
           </div>
         )}
       </div>
@@ -171,24 +169,28 @@ function FAQsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-16">
+    <div className="min-h-screen bg-[#F4EDE4] py-16">
       <div className="w-full px-4 sm:px-6 lg:px-8">
+        
         {/* Header */}
         <div className="max-w-4xl mx-auto text-center mb-12">
-          <h1 className="text-5xl font-bold text-gray-900 mb-4">Frequently Asked Questions</h1>
-          <p className="text-xl text-gray-600 mb-8">
+          <div className="w-16 h-16 bg-[#FAF6F0] border border-[#DCC7AA] rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-sm">
+            <HelpCircle size={32} className="text-[#A6754D]" />
+          </div>
+          <h1 className="text-4xl md:text-5xl font-bold text-[#4E3B2C] mb-4">Frequently Asked Questions</h1>
+          <p className="text-lg text-[#7C6652] mb-8">
             Find answers to common questions about shopping, orders, returns, and more.
           </p>
 
           {/* Search */}
           <div className="relative max-w-2xl mx-auto">
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-[#A6754D]" size={20} />
             <input
               type="text"
-              placeholder="Search FAQs..."
+              placeholder="Search FAQs (e.g. M-PESA, delivery, returns)..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-12 pr-4 py-4 bg-white border border-[#DCC7AA] rounded-xl text-[#4E3B2C] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#A6754D]/30 focus:border-[#A6754D] shadow-sm transition"
             />
           </div>
         </div>
@@ -198,7 +200,7 @@ function FAQsPage() {
           {filteredFaqs.length > 0 ? (
             filteredFaqs.map((category, catIndex) => (
               <div key={catIndex} className="mb-12">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6 pb-4 border-b-2 border-blue-600">
+                <h2 className="text-2xl font-bold text-[#4E3B2C] mb-6 pb-4 border-b-2 border-[#A6754D]">
                   {category.category}
                 </h2>
                 <div className="space-y-4">
@@ -215,11 +217,12 @@ function FAQsPage() {
               </div>
             ))
           ) : (
-            <div className="text-center py-12">
-              <p className="text-xl text-gray-600 mb-4">No results found for "{searchTerm}"</p>
+            <div className="text-center py-16 bg-white rounded-2xl border border-[#DCC7AA]">
+              <p className="text-xl text-[#4E3B2C] font-bold mb-2">No results found for "{searchTerm}"</p>
+              <p className="text-[#7C6652] mb-6">Try searching for a different keyword.</p>
               <button
                 onClick={() => setSearchTerm("")}
-                className="text-blue-600 font-semibold hover:text-blue-700"
+                className="bg-[#A6754D] text-white px-6 py-2.5 rounded-lg font-bold hover:bg-[#8D5F3B] transition"
               >
                 Clear search
               </button>
@@ -228,21 +231,21 @@ function FAQsPage() {
         </div>
 
         {/* Still Need Help */}
-        <div className="max-w-4xl mx-auto mt-16 bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-8 border border-blue-200 text-center">
-          <h3 className="text-2xl font-bold text-gray-900 mb-3">Still need help?</h3>
-          <p className="text-gray-600 mb-6">
-            Can't find the answer you're looking for? Our support team is here to help!
+        <div className="max-w-4xl mx-auto mt-16 bg-[#4E3B2C] rounded-2xl p-8 md:p-12 text-center shadow-xl">
+          <h3 className="text-2xl md:text-3xl font-bold text-white mb-3">Still need help?</h3>
+          <p className="text-[#F4EDE4]/80 mb-8 max-w-lg mx-auto">
+            Can't find the answer you're looking for? Our Nairobi support team is here to help you out.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
               href="/contact"
-              className="bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
+              className="bg-[#A6754D] text-white px-8 py-3 rounded-lg font-bold hover:bg-[#8D5F3B] transition shadow-md"
             >
               Contact Us
             </a>
             <a
-              href="mailto:support@ecom.com"
-              className="bg-white text-blue-600 border-2 border-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition"
+              href="mailto:support@nairobifashion.co.ke"
+              className="bg-transparent text-white border-2 border-white px-8 py-3 rounded-lg font-bold hover:bg-white hover:text-[#4E3B2C] transition"
             >
               Email Support
             </a>

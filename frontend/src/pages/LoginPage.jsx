@@ -5,7 +5,12 @@ import { showError, showSuccess } from "../services/toast";
 import { socialAuth } from "../services/api";
 import { GoogleOAuthProvider, useGoogleLogin } from "@react-oauth/google";
 
-const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID || "";
+// 🛠️ SAFE CLIENT ID: Checks Vite env first, then CRA env.
+// IMPORTANT: Put your actual Client ID here as a fallback so it NEVER crashes.
+const GOOGLE_CLIENT_ID = 
+  import.meta.env?.VITE_GOOGLE_CLIENT_ID || 
+  process.env?.REACT_APP_GOOGLE_CLIENT_ID || 
+  "REACT_APP_API_BASE_URL=http://127.0.0.1:8000746644224780-ldrhfgmokam5nubu8h0g6vmlmrbsot52.apps.googleusercontent.com"; 
 
 const BG_IMAGES = [
   "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1920&q=80",
@@ -14,7 +19,6 @@ const BG_IMAGES = [
   "https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=1920&q=80",
 ];
 
-// Inner component — needs to be inside GoogleOAuthProvider to use useGoogleLogin
 function LoginForm() {
   const { login, loginWithTokens } = useAppContext();
   const [email, setEmail]               = useState("");
@@ -37,7 +41,6 @@ function LoginForm() {
 
   const canSubmit = email.trim().length > 0 && password.length > 0 && !loading;
 
-  // --- MANUAL LOGIN ---
   const handleSubmit = async (e) => {
     e.preventDefault();
     setFormError("");
@@ -51,7 +54,7 @@ function LoginForm() {
     try {
       await login(email.trim(), password);
       showSuccess("Login successful.");
-      setTimeout(() => navigate(from, { replace: true }), 2000);
+      setTimeout(() => navigate(from, { replace: true }), 1500);
     } catch (err) {
       const msg =
         err.response?.data?.non_field_errors?.[0] ||
@@ -64,15 +67,15 @@ function LoginForm() {
       setLoading(false);
     }
   };
+
   const handleGoogleLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
       setLoading(true);
       try {
         const data = await socialAuth('google', tokenResponse.access_token);
-        // Save tokens and user — adjust based on your AppContext API
         loginWithTokens(data);
         showSuccess("Google login successful.");
-        setTimeout(() => navigate(from, { replace: true }), 2000);
+        setTimeout(() => navigate(from, { replace: true }), 1500);
       } catch (err) {
         const msg = err.response?.data?.non_field_errors?.[0] || "Google login failed.";
         setFormError(msg);
@@ -85,9 +88,11 @@ function LoginForm() {
       showError("Google sign-in was cancelled or failed.");
     },
   });
+
   const handleFacebookLogin = () => {
+    // 🛠️ SAFE CHECK: Prevents crash if FB SDK is not loaded
     if (!window.FB) {
-      showError("Facebook SDK not loaded. Please refresh and try again.");
+      showError("Facebook login is currently unavailable.");
       return;
     }
     window.FB.login(
@@ -98,7 +103,7 @@ function LoginForm() {
             .then((data) => {
               loginWithTokens(data);
               showSuccess("Facebook login successful.");
-              setTimeout(() => navigate(from, { replace: true }), 2000);
+              setTimeout(() => navigate(from, { replace: true }), 1500);
             })
             .catch((err) => {
               const msg = err.response?.data?.non_field_errors?.[0] || "Facebook login failed.";
@@ -134,7 +139,6 @@ function LoginForm() {
       `}</style>
 
       <div className="min-vh-100 d-flex align-items-center justify-content-center p-3 position-relative overflow-hidden">
-
         {BG_IMAGES.map((img, i) => (
           <div
             key={img}
@@ -162,26 +166,8 @@ function LoginForm() {
                 style={{ backgroundColor: "rgba(255,255,255,0.95)", backdropFilter: "blur(10px)" }}
               >
                 <div className="card-body p-4">
-
                   <div className="text-center mb-3">
-                    <div className="mb-2">
-                      <div
-                        className="d-inline-flex align-items-center justify-content-center rounded-circle"
-                        style={{ width: "56px", height: "56px", background: "linear-gradient(135deg,#FF6B6B 0%,#FFE66D 100%)" }}
-                      >
-                        <i className="fas fa-shopping-bag text-white" style={{ fontSize: "24px" }} />
-                      </div>
-                    </div>
-                    <h2
-                      className="fw-bold mb-1"
-                      style={{
-                        fontSize: "24px",
-                        background: "linear-gradient(135deg,#FF6B6B 0%,#FF8E53 100%)",
-                        WebkitBackgroundClip: "text",
-                        WebkitTextFillColor: "transparent",
-                        backgroundClip: "text",
-                      }}
-                    >
+                    <h2 className="fw-bold mb-1" style={{ fontSize: "24px", color: "#4E3B2C" }}>
                       Welcome Back
                     </h2>
                     <p className="text-muted mb-0 small">Sign in to your account to continue</p>
@@ -195,7 +181,7 @@ function LoginForm() {
                         disabled={loading}
                         className="btn btn-light border w-100 d-flex align-items-center justify-content-center py-2"
                       >
-                        <svg className="me-2" width="16" height="16" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+                        <svg className="me-2" width="16" height="16" viewBox="0 0 18 18">
                           <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" fill="#4285F4"/>
                           <path d="M9.003 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.96v2.332C2.44 15.983 5.485 18 9.003 18z" fill="#34A853"/>
                           <path d="M3.964 10.712c-.18-.54-.282-1.117-.282-1.71 0-.593.102-1.17.282-1.71V4.96H.957C.347 6.175 0 7.55 0 9.002c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
@@ -212,7 +198,7 @@ function LoginForm() {
                         className="btn w-100 d-flex align-items-center justify-content-center py-2 text-white"
                         style={{ backgroundColor: "#1877F2", borderColor: "#1877F2" }}
                       >
-                        <svg className="me-2" width="16" height="16" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+                        <svg className="me-2" width="16" height="16" viewBox="0 0 24 24" fill="white">
                           <path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.236 2.686.236v2.97h-1.513c-1.491 0-1.956.93-1.956 1.886v2.267h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/>
                         </svg>
                         <span className="small fw-medium">Facebook</span>
@@ -226,9 +212,8 @@ function LoginForm() {
                   </div>
 
                   {formError && (
-                    <div className="alert alert-danger d-flex align-items-center py-2 mb-3 small" role="alert">
-                      <i className="fas fa-exclamation-circle me-2" />
-                      <span>{formError}</span>
+                    <div className="alert alert-danger py-2 mb-3 small" role="alert">
+                      {formError}
                     </div>
                   )}
 
@@ -275,7 +260,6 @@ function LoginForm() {
                           onClick={() => setShowPassword((p) => !p)}
                           className="btn btn-link position-absolute top-50 end-0 translate-middle-y me-2 p-0 text-muted"
                           style={{ zIndex: 5 }}
-                          aria-label={showPassword ? "Hide password" : "Show password"}
                         >
                           <i className={`fas ${showPassword ? "fa-eye-slash" : "fa-eye"}`} />
                         </button>
@@ -287,21 +271,19 @@ function LoginForm() {
                         type="submit" disabled={!canSubmit}
                         className="btn py-2 fw-semibold text-white"
                         style={{
-                          background: "linear-gradient(135deg,#FF6B6B 0%,#FF8E53 100%)",
+                          background: "#A6754D", // Matched to your brand color
                           border: "none",
                           opacity: !canSubmit ? 0.65 : 1,
                         }}
                       >
-                        {loading ? (
-                          <><span className="spinner-border spinner-border-sm me-2" role="status" />Signing In…</>
-                        ) : "Sign In"}
+                        {loading ? "Signing In…" : "Sign In"}
                       </button>
                     </div>
                   </form>
 
                   <div className="text-center">
                     <p className="mb-0 text-muted small">
-                      Don&apos;t have an account?{" "}
+                      Don't have an account?{" "}
                       <button
                         type="button"
                         onClick={() => navigate("/register")}
@@ -323,7 +305,6 @@ function LoginForm() {
   );
 }
 
-// Wrap with GoogleOAuthProvider so useGoogleLogin hook works
 export default function LoginPage() {
   return (
     <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>

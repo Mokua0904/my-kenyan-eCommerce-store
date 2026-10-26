@@ -38,22 +38,39 @@ export default function AnalyticsOverview() {
   const [loading, setLoading]       = useState(true);
 
   useEffect(() => {
+    let isMounted = true;
+
     const load = async () => {
-      setLoading(true);
+      if (isMounted) setLoading(true);
       try {
         const [s, chart, bd] = await Promise.all([
           analyticsService.dashboard({ period }),
           analyticsService.salesChart(period),
           analyticsService.salesBreakdown(period),
         ]);
-        setStats(s.data);
-        setChartData(chart.data);
-        setBreakdown(bd.data);
+        
+        if (isMounted) {
+          setStats(s.data || null);
+          setChartData(chart.data || []);
+          setBreakdown(bd.data || []);
+        }
+      } catch (error) {
+        console.error("Failed to load overview analytics:", error);
+        // 🛠️ FIX: Prevent crash on API failure
+        if (isMounted) {
+          setStats(null);
+          setChartData([]);
+          setBreakdown([]);
+        }
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     };
     load();
+
+    return () => {
+      isMounted = false;
+    };
   }, [period]);
 
   if (loading) return <LoadingState />;

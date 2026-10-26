@@ -34,30 +34,51 @@ export default function AnalyticsProducts() {
   const [loading, setLoading]         = useState(true);
 
   useEffect(() => {
+    let isMounted = true;
+
     const load = async () => {
-      setLoading(true);
+      if (isMounted) setLoading(true);
       try {
         const [tp, cat, st] = await Promise.all([
           analyticsService.topProducts(period, 10),
           analyticsService.productCategories(period),
           analyticsService.productStock(),
         ]);
-        setTopProducts(tp.data);
-        setCategories(cat.data);
-        setStock(st.data);
+        
+        if (isMounted) {
+          setTopProducts(tp.data || []);
+          setCategories(cat.data || []);
+          setStock(st.data || []);
+        }
+      } catch (error) {
+        console.error("Failed to load product analytics:", error);
+        // 🛠️ FIX: Prevent crash on API failure
+        if (isMounted) {
+          setTopProducts([]);
+          setCategories([]);
+          setStock([]);
+        }
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     };
     load();
+
+    return () => {
+      isMounted = false;
+    };
   }, [period]);
 
   if (loading) return <LoadingState />;
 
-  const totalProducts = stock.length;
-  const lowStock      = stock.filter(p => p.stock_level === 'low').length;
-  const outOfStock    = stock.filter(p => p.stock_level === 'critical').length;
-  const topRevProduct = topProducts[0];
+  const safeStock = Array.isArray(stock) ? stock : [];
+  const safeTopProducts = Array.isArray(topProducts) ? topProducts : [];
+  const safeCategories = Array.isArray(categories) ? categories : [];
+
+  const totalProducts = safeStock.length;
+  const lowStock      = safeStock.filter(p => p.stock_level === 'low').length;
+  const outOfStock    = safeStock.filter(p => p.stock_level === 'critical').length;
+  const topRevProduct = safeTopProducts[0];
 
   return (
     <div>
@@ -70,18 +91,19 @@ export default function AnalyticsProducts() {
 
       {/* KPIs */}
       <div className="grid-4 mb-6">
-        <KpiCard icon={Package}      label="Products Tracked"  value={totalProducts}          color="#c2621a" />
-        <KpiCard icon={TrendingUp}   label="Top Product Revenue" value={fmt.short(topRevProduct?.revenue)} color="#2d7a4a" />
-        <KpiCard icon={AlertTriangle} label="Low Stock Items"  value={lowStock}   color="#b8860b" />
-        <KpiCard icon={XCircle}      label="Out of Stock"       value={outOfStock} color="#c0392b" />
+        {/* 🛠️ FIX: Added fmt.number() */}
+        <KpiCard icon={Package}        label="Products Tracked"   value={fmt.number(totalProducts)}   color="#c2621a" />
+        <KpiCard icon={TrendingUp}     label="Top Product Revenue" value={fmt.short(topRevProduct?.revenue)} color="#2d7a4a" />
+        <KpiCard icon={AlertTriangle}  label="Low Stock Items"    value={fmt.number(lowStock)}        color="#b8860b" />
+        <KpiCard icon={XCircle}        label="Out of Stock"        value={fmt.number(outOfStock)}      color="#c0392b" />
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '3fr 2fr', gap: 20, marginBottom: 20 }}>
         {/* Top Products by Revenue */}
         <ChartCard title="Top Products by Revenue" subtitle={`Last ${period} days`}>
-          {topProducts.length === 0 ? <EmptyChart /> : (
+          {safeTopProducts.length === 0 ? <EmptyChart /> : (
             <ResponsiveContainer width="100%" height={280}>
-              <BarChart data={topProducts} layout="vertical" margin={{ left: 10, right: 60 }}>
+              <BarChart data={safeTopProducts} layout="vertical" margin={{ left: 10, right: 60 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke={CHART_COLORS.grid} horizontal={false} />
                 <XAxis type="number" tick={{ fontSize: 10 }} tickFormatter={v => fmt.short(v)} />
                 <YAxis
@@ -93,7 +115,7 @@ export default function AnalyticsProducts() {
                   contentStyle={{ background: 'var(--sidebar-bg)', color: 'white', border: 'none', borderRadius: 8, fontSize: 12 }}
                 />
                 <Bar dataKey="revenue" name="Revenue" radius={[0, 4, 4, 0]}>
-                  {topProducts.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
+                  {safeTopProducts.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
@@ -102,17 +124,17 @@ export default function AnalyticsProducts() {
 
         {/* Category Pie */}
         <ChartCard title="Sales by Category" subtitle="Revenue distribution across categories">
-          {categories.length === 0 ? <EmptyChart /> : (
+          {safeCategories.length === 0 ? <EmptyChart /> : (
             <ResponsiveContainer width="100%" height={280}>
               <PieChart>
                 <Pie
-                  data={categories} dataKey="count"
+                  data={safeCategories} dataKey="count"
                   nameKey="name" cx="50%" cy="45%"
                   outerRadius={90} innerRadius={45}
                   labelLine={false}
                   label={CustomPieLabel}
                 >
-                  {categories.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
+                  {safeCategories.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                 </Pie>
                 <Tooltip contentStyle={{ background: 'var(--sidebar-bg)', color: 'white', border: 'none', borderRadius: 8, fontSize: 12 }} />
               </PieChart>
@@ -124,9 +146,9 @@ export default function AnalyticsProducts() {
       {/* Units Sold */}
       <div className="mb-5">
         <ChartCard title="Top Products by Units Sold" subtitle="Volume leaders this period">
-          {topProducts.length === 0 ? <EmptyChart /> : (
+          {safeTopProducts.length === 0 ? <EmptyChart /> : (
             <ResponsiveContainer width="100%" height={200}>
-              <BarChart data={topProducts.slice(0, 8)} margin={{ top: 4, right: 10 }}>
+              <BarChart data={safeTopProducts.slice(0, 8)} margin={{ top: 4, right: 10 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke={CHART_COLORS.grid} />
                 <XAxis
                   dataKey="name" tick={{ fontSize: 10 }}
@@ -145,7 +167,7 @@ export default function AnalyticsProducts() {
 
       {/* Stock Health Table */}
       <ChartCard title="Inventory Health" subtitle="Products ordered by current stock level">
-        {stock.length === 0 ? <EmptyChart message="No products found" /> : (
+        {safeStock.length === 0 ? <EmptyChart message="No products found" /> : (
           <div>
             {/* Summary pills */}
             <div style={{ display: 'flex', gap: 12, marginBottom: 16 }}>
@@ -160,7 +182,7 @@ export default function AnalyticsProducts() {
                   background: color + '15', color, fontSize: 12, fontWeight: 500,
                 }}>
                   <div style={{ width: 8, height: 8, borderRadius: '50%', background: color }} />
-                  {label}: {stock.filter(p => p.stock_level === key).length}
+                  {label}: {safeStock.filter(p => p.stock_level === key).length}
                 </div>
               ))}
             </div>
@@ -177,7 +199,7 @@ export default function AnalyticsProducts() {
                   </tr>
                 </thead>
                 <tbody>
-                  {stock.map(p => (
+                  {safeStock.map(p => (
                     <tr key={p.id}>
                       <td style={{ fontWeight: 500 }}>{p.name}</td>
                       <td style={{ color: 'var(--text-muted)', fontSize: 13 }}>{p.category}</td>

@@ -32,6 +32,7 @@ function AdminLayout() {
           height: 100vh;
           width: 100%;
           overflow: hidden;
+          background: #F4EDE4; /* 🛠️ Nairobi Cream background */
         }
 
         /* ── Desktop sidebar ── */
@@ -92,10 +93,11 @@ function AdminLayout() {
           min-height: 0;
         }
 
+        /* 🛠️ Changed from max-width 1280px to 1600px to fill large screens better */
         .admin-page-inner {
           width: 100%;
           padding: 24px 16px;
-          max-width: 1280px;
+          max-width: 1600px;
           margin: 0 auto;
         }
 
@@ -107,15 +109,15 @@ function AdminLayout() {
           width: 38px;
           height: 38px;
           background: transparent;
-          border: 1px solid var(--border-light);
+          border: 1px solid #DCC7AA;
           border-radius: 8px;
           cursor: pointer;
-          color: var(--text-primary);
+          color: #4E3B2C;
           flex-shrink: 0;
           margin-right: 8px;
         }
         .mobile-menu-btn:hover {
-          background: var(--surface-2);
+          background: #FAF6F0;
         }
 
         /* ── Breakpoint: tablet and below (< 768px) ── */
@@ -146,8 +148,8 @@ function AdminLayout() {
       `}</style>
 
       <div className="admin-layout">
-
-        {/* Desktop sidebar — always visible ≥768px */}
+        
+        {/* Desktop Sidebar */}
         <div className="sidebar-desktop">
           <Sidebar
             collapsed={collapsed}
@@ -155,13 +157,13 @@ function AdminLayout() {
           />
         </div>
 
-        {/* Mobile overlay backdrop */}
+        {/* Mobile Overlay */}
         <div
           className={`sidebar-overlay ${mobileOpen ? "open" : ""}`}
           onClick={() => setMobileOpen(false)}
         />
 
-        {/* Mobile drawer */}
+        {/* Mobile Drawer */}
         <div className={`sidebar-drawer ${mobileOpen ? "open" : ""}`}>
           <Sidebar
             collapsed={false}
@@ -170,12 +172,10 @@ function AdminLayout() {
           />
         </div>
 
-        {/* Main content */}
+        {/* Main Content */}
         <div className="admin-main">
           <div className="admin-topbar-wrapper">
-            <Topbar
-              onMobileMenuClick={() => setMobileOpen(true)}
-            />
+            <Topbar onMobileMenuClick={() => setMobileOpen(true)} />
           </div>
           <div className="admin-page-content">
             <div className="admin-page-inner">
@@ -183,6 +183,7 @@ function AdminLayout() {
             </div>
           </div>
         </div>
+        
       </div>
     </>
   );

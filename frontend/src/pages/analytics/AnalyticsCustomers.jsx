@@ -22,8 +22,10 @@ export default function AnalyticsCustomers() {
   const [loading, setLoading]       = useState(true);
 
   useEffect(() => {
+    let isMounted = true; // Prevents state updates if the component unmounts
+
     const load = async () => {
-      setLoading(true);
+      if (isMounted) setLoading(true);
       try {
         const [tc, g, r, br] = await Promise.all([
           analyticsService.topCustomers(period, 10),
@@ -31,15 +33,31 @@ export default function AnalyticsCustomers() {
           analyticsService.customerRetention(period),
           analyticsService.customersByRole(),
         ]);
-        setTop(tc.data);
-        setGrowth(g.data);
-        setRetention(r.data);
-        setByRole(br.data);
+        
+        if (isMounted) {
+          setTop(tc.data || []);
+          setGrowth(g.data || []);
+          setRetention(r.data || null);
+          setByRole(br.data || {});
+        }
+      } catch (error) {
+        console.error("Failed to load customer analytics:", error);
+        // 🛠️ FIX: If the API fails, show empty data instead of crashing the whole page
+        if (isMounted) {
+          setTop([]);
+          setGrowth([]);
+          setRetention(null);
+          setByRole({});
+        }
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     };
     load();
+
+    return () => {
+      isMounted = false;
+    };
   }, [period]);
 
   if (loading) return <LoadingState />;
